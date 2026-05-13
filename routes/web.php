@@ -28,7 +28,6 @@ Route::post('/admin/login', [AdminController::class, 'login']);
 Route::get('/admin/logout', [AdminController::class, 'logout'])->name('logout');
 
 Route::prefix('admin')->middleware(['auth'])->group(function () {
-     Route::get('/admin/logout', [AdminController::class, 'logout'])->name('logout');
     Route::get('/dashboard', [AdminController::class, 'dashboard']);
 
     // Products
