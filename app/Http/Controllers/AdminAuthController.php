@@ -1,8 +1,8 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AdminAuthController extends Controller
 {
@@ -21,12 +21,9 @@ class AdminAuthController extends Controller
             }
 
             Auth::logout();
-            return back()->withErrors('Not admin account');
+            return back()->with('error', 'You are not an admin.');
         }
 
-        return back()->withErrors('Invalid login');
+        return back()->with('error', 'Invalid email or password.');
     }
-
-    
 }
-
