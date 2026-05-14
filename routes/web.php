@@ -69,3 +69,10 @@ Route::get('/privacy', function () {
     return view('privacy');
 });
 
+
+
+
+Route::get('/check-user', function () {
+    $user = App\Models\User::where('email', 'delfinusideusdedith@gmail.com')->first();
+    return $user;
+});
