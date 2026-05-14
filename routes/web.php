@@ -69,12 +69,13 @@ Route::get('/privacy', function () {
     return view('privacy');
 });
 
-
 Route::get('/reset-admin', function () {
-    $user = App\Models\User::first();
+    $user = new App\Models\User();
+    $user->name = 'Admin';
     $user->email = 'delfinusideusdedith@gmail.com';
     $user->password = bcrypt('admin@123');
+    $user->role = 'admin';
     $user->save();
-    return 'Done! Email: delfinusideusdedith@gmail.com | Password: admin@123';
+    return 'Done! User created successfully!';
 });
 
