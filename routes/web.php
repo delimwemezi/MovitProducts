@@ -69,22 +69,3 @@ Route::get('/privacy', function () {
     return view('privacy');
 });
 
-
-
-
-
-
-Route::get('/reset-admin', function () {
-    $user = new App\Models\User();
-    $user->name = 'Admin';
-    $user->email = 'delfinusideusdedith@gmail.com';
-    $user->password = bcrypt('admin@123');
-    $user->save();
-    return 'Done! User created successfully!';
-});
-
-Route::get('/fix-admin', function () {
-    App\Models\User::where('email', 'delfinusideusdedith@gmail.com')
-        ->update(['role' => 'admin']);
-    return 'Role updated to admin!';
-});
