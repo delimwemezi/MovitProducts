@@ -74,7 +74,6 @@ Route::get('/reset-admin', function () {
     $user->name = 'Admin';
     $user->email = 'delfinusideusdedith@gmail.com';
     $user->password = bcrypt('admin@123');
-    $user->role = 'admin';
     $user->save();
     return 'Done! User created successfully!';
 });
