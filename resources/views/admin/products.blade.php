@@ -152,8 +152,8 @@
     <td>{{ $product->name }}</td>
 
     <!-- PRICE -->
-    <td><strong>Tsh {{ number_format($product->price) }}</strong></td>
-
+    <td><strong>Carton_P Tsh {{ number_format($product->carton_price) }}</strong></td>
+    <td><strong>Piece_P Tsh {{ number_format($product->piece_price) }}</strong></td>
     <!-- ACTION -->
     <td class="actions">
         <a href="/admin/products/edit/{{ $product->id }}" class="edit">✏ Edit</a>
