@@ -8,7 +8,8 @@ class Product extends Model
 {
     protected $fillable = [
         'name',
-        'price',
+        'CartonPrice',
+        'PiecePrice',
         'description',
         'category_id',
         'image',        // ← stores path like "products/uuid.jpg"
