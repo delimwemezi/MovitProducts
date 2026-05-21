@@ -110,9 +110,15 @@
             <input type="text" name="name" placeholder="Product Name" required>
         </div>
 
-        <div class="form-group">
-            <input type="number" name="price" placeholder="Price" required>
-        </div>
+      <div class="form-group">
+    <label for="carton_price">Carton Price</label>
+    <input type="number" name="carton_price" id="carton_price" placeholder="Carton Price" step="0.01" min="0" required>
+</div>
+
+<div class="form-group">
+    <label for="piece_price">Piece Price</label>
+    <input type="number" name="piece_price" id="piece_price" placeholder="Piece Price" step="0.01" min="0" required>
+</div>
 
         <div class="form-group">
             <textarea name="description" placeholder="Description"></textarea>
