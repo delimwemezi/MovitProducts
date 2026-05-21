@@ -31,8 +31,8 @@
       <div class="card-body">
         <h3>{{ $product->name }}</h3>
         <p>{{ $product->description }}</p>
-        <p class="price">TSh {{ number_format($product->CartonPrice) }}</p>
-        <p class="price">TSh {{ number_format($product->PiecePrice) }}</p>   
+        <p class="price">TSh {{ number_format($product->carton_price) }}</p>
+        <p class="price">TSh {{ number_format($product->piece_price) }}</p>   
     </div>
      
             <!-- BUTTON 
