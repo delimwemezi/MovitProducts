@@ -35,6 +35,19 @@ body, html {
     width: 100%;
 }
 
+.price span {
+    font-size: 13px;
+    color: #888;
+    font-weight: normal;
+    margin-right: 4px;
+}
+
+.price {
+    font-weight: bold;
+    color: #e81a8b;
+    margin: 4px 0;
+}
+
 /* DESCRIPTION - hidden by default */
 .card p {
     color: white;
