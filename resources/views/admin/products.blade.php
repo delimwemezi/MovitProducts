@@ -131,7 +131,8 @@
 <tr>
     <th>Image</th>
     <th>Name</th>
-    <th>Price</th>
+    <th>CartonPrice</th>
+    <th>PiecePrice</th>
     <th>Action</th>
 </tr>
 
