@@ -76,8 +76,15 @@
         <label>Product Name</label>
         <input type="text" name="name" value="{{ $product->name }}" required>
 
-        <label>Price</label>
-        <input type="number" name="price" value="{{ $product->price }}" required>
+        <div class="form-group">
+    <label for="carton_price">Carton Price</label>
+    <input type="number" name="carton_price" id="carton_price" placeholder="Carton Price" step="0.01" min="0" required>
+</div>
+
+<div class="form-group">
+    <label for="piece_price">Piece Price</label>
+    <input type="number" name="piece_price" id="piece_price" placeholder="Piece Price" step="0.01" min="0" required>
+</div>
 
         <label>Description</label>
         <textarea name="description">{{ $product->description }}</textarea>
