@@ -117,8 +117,8 @@ class AdminController extends Controller
 
         $request->validate([
             'name'        => 'required|string|max:255',
-            'CartonPrice'       => 'required|numeric|min:0',
-            'PiecePrice'       => 'required|numeric|min:0',                
+            'carton_price'       => 'required|numeric|min:0',
+            'piece_price'       => 'required|numeric|min:0',                
             'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
             'image_file'  => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
