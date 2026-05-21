@@ -111,12 +111,12 @@
         </div>
 
       <div class="form-group">
-    <label for="carton_price">Carton Price</label>
+    <label for="carton_price">CartonPrice</label>
     <input type="number" name="carton_price" id="carton_price" placeholder="Carton Price" step="0.01" min="0" required>
 </div>
 
 <div class="form-group">
-    <label for="piece_price">Piece Price</label>
+    <label for="piece_price">PiecePrice</label>
     <input type="number" name="piece_price" id="piece_price" placeholder="Piece Price" step="0.01" min="0" required>
 </div>
 
