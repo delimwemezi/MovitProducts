@@ -202,7 +202,8 @@ class AdminController extends Controller
 
         Product::create([
             'name'        => $request->name,
-            'price'       => $request->price,
+            'carton_price'       => $request->carton_price,
+            'piece_price'       => $request->piece_price,            
             'description' => $request->description,
             'category_id' => $request->category_id,
             'image'       => $imagePath,
@@ -226,7 +227,8 @@ class AdminController extends Controller
         // ✅ FIX #5: Added missing validation (was completely absent before)
         $request->validate([
             'name'        => 'required|string|max:255',
-            'price'       => 'required|numeric|min:0',
+            'carton_price'       => 'required|numeric|min:0',
+            'piece_price'       => 'required|numeric|min:0',                
             'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
             'image'       => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
@@ -248,7 +250,8 @@ class AdminController extends Controller
 
         $product->update([
             'name'        => $request->name,
-            'price'       => $request->price,
+            'carton_price'       => $request->carton_price,
+            'piece_price'       => $request->piece_price,              
             'description' => $request->description,
             'category_id' => $request->category_id,
         ]);
