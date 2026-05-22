@@ -242,7 +242,7 @@ body, html {
 
 .categories h1 {
     margin-bottom: 10px;
-    color: whitesmoke;
+    color: #E81A8A;
 }
 
 .category-grid {
@@ -280,12 +280,12 @@ body, html {
 .featured {
     margin-top: 20px;
     text-align: center;
-    color: #c16372;
+    color: #E81A8A;
 }
 
 .featured h1 {
     margin-bottom: 10px;
-    color: whitesmoke;
+    color: #E81A8A;
 }
 
 .deal-grid {
@@ -327,7 +327,7 @@ body, html {
     padding: 60px;
     
     text-align: center;
-    color: white;
+    color: #E81A8A;
     filter: brightness(1.1);
     border-radius: 10px;
     height: 300px;
