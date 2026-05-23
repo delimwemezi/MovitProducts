@@ -167,6 +167,7 @@ body, html {
     padding: 6px 6px 6px 16px;
     margin-bottom: 20px;
 }
+
 .search-box input {
     border: none;
     outline: none;
@@ -174,7 +175,8 @@ body, html {
     font-size: 15px;
     flex: 1;
 }
-.search-box button {
+
+.search-box .btn {
     background: #e91e8c;
     color: #fff;
     border: none;
@@ -182,6 +184,10 @@ body, html {
     padding: 8px 18px;
     font-size: 14px;
     cursor: pointer;
+}
+
+.search-box .btn:hover {
+    background: #c4177a;
 }
 
 /* NAVBAR (if not styled yet) */
