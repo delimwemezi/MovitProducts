@@ -4,7 +4,7 @@
 <div class="container">
 
     <!-- SEARCH -->
-    <form method="GET" action="{{  route('products') }}" class="search-box">
+<form method="GET" action="/products" class="search-box">
     <i class="ti ti-search search-icon"></i>
     <input type="text" name="search" placeholder="Search products..." value="{{ request('search') }}">
     <button type="submit" class="btn">Search</button>
