@@ -4,10 +4,11 @@
 <div class="container">
 
     <!-- SEARCH -->
-    <form method="GET" class="search-box">
-        <input type="text" name="search" placeholder="Search product...">
-        <button class="btn">Search</button>
-    </form>
+    <form method="GET" action="{{ route('your.route') }}" class="search-box">
+    <i class="ti ti-search search-icon"></i>
+    <input type="text" name="search" placeholder="Search products..." value="{{ request('search') }}">
+    <button type="submit" class="btn">Search</button>
+</form>
      
        <!-- CATEGORIES -->
     <section class="categories">
