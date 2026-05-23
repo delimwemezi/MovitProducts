@@ -127,11 +127,8 @@ class AdminController extends Controller
 
         $imagePath = null;
 
-        if ($request->hasFile('image_file')) {
-            $file      = $request->file('image_file');
-            $filename  = Str::uuid() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('images'), $filename);
-            $imagePath = $filename;
+      if ($request->hasFile('image_file')) {
+    $imagePath = cloudinary()->upload($request->file('image_file')->getRealPath())->getSecurePath();
 
         } elseif ($request->filled('image_url')) {
             $url = $request->input('image_url');
