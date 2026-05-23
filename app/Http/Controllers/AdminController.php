@@ -233,17 +233,9 @@ class AdminController extends Controller
 
         $product = Product::findOrFail($id);
 
-        if ($request->hasFile('image')) {
-            // ✅ FIX #8: Safe file deletion with error suppression
-            if ($product->image && file_exists(public_path('images/' . $product->image))) {
-                @unlink(public_path('images/' . $product->image));
-            }
-
-            $image     = $request->file('image');
-            $imageName = Str::uuid() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('images'), $imageName);
-            $product->image = $imageName;
-        }
+     if ($request->hasFile('image')) {
+    $product->image = cloudinary()->upload($request->file('image')->getRealPath())->getSecurePath();
+}
 
         $product->update([
             'name'        => $request->name,
