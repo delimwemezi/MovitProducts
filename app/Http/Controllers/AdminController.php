@@ -128,7 +128,7 @@ class AdminController extends Controller
         $imagePath = null;
 
       if ($request->hasFile('image_file')) {
-    $imagePath = cloudinary()->upload($request->file('image_file')->getRealPath())->getSecurePath();
+   $imagePath = cloudinary()->uploadApi()->upload($request->file('image_file')->getRealPath())['secure_url'];
 
         } elseif ($request->filled('image_url')) {
             $url = $request->input('image_url');
@@ -234,7 +234,7 @@ class AdminController extends Controller
         $product = Product::findOrFail($id);
 
      if ($request->hasFile('image')) {
-    $product->image = cloudinary()->upload($request->file('image')->getRealPath())->getSecurePath();
+    $product->image = cloudinary()->uploadApi()->upload($request->file('image')->getRealPath())['secure_url'];
 }
 
         $product->update([
