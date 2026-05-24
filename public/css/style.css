@@ -132,13 +132,6 @@ body, html {
     color: white;
 }
 
-/* DESCRIPTION 
-.card p {
-    color: white;
-    font-size: 15px;
-    font-weight: bold;
-}*/
-
 /* BUTTON */
 .btn {
     display: block;
@@ -190,7 +183,7 @@ body, html {
     background: #c4177a;
 }
 
-/* NAVBAR (if not styled yet) */
+/* NAVBAR  */
 .navbar {
     background: white;
     padding: 15px;
