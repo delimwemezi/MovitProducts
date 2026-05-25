@@ -24,8 +24,7 @@ class AdminController extends Controller
             return redirect('/admin/login');
         }
 
-        // Auto logout after 5 minutes of inactivity
-        $timeout = 5 * 60; // 5 minutes in seconds
+        $timeout = 5 * 60;
 
         if (session('last_activity') && (time() - session('last_activity') > $timeout)) {
             Auth::logout();
@@ -34,9 +33,7 @@ class AdminController extends Controller
             return redirect('/admin/login')->with('error', 'Session expired. Please login again.');
         }
 
-        // Update last activity time on every request
         session(['last_activity' => time()]);
-
         return null;
     }
 
@@ -60,9 +57,8 @@ class AdminController extends Controller
             $user = Auth::user();
 
             if ($user->is_admin) {
-                // ✅ FIX #6: Initialize last_activity on login so session timeout works correctly
                 session(['last_activity' => time()]);
-                $request->session()->regenerate(); // prevent session fixation
+                $request->session()->regenerate();
                 return redirect('/admin/dashboard');
             }
 
@@ -73,8 +69,6 @@ class AdminController extends Controller
         return back()->with('error', 'Invalid credentials');
     }
 
-    // ✅ FIX #2: Logout uses POST (CSRF protected). Update your route to: Route::post('/admin/logout', ...)
-    // and your logout button to: <form method="POST" action="/admin/logout">@csrf<button>Logout</button></form>
     public function logout(Request $request)
     {
         Auth::logout();
@@ -117,8 +111,8 @@ class AdminController extends Controller
 
         $request->validate([
             'name'        => 'required|string|max:255',
-            'carton_price'       => 'required|numeric|min:0',
-            'piece_price'       => 'required|numeric|min:0',                
+            'carton_price'=> 'required|numeric|min:0',
+            'piece_price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
             'image_file'  => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
@@ -127,13 +121,15 @@ class AdminController extends Controller
 
         $imagePath = null;
 
-      if ($request->hasFile('image_file')) {
-   $imagePath = cloudinary()->uploadApi()->upload($request->file('image_file')->getRealPath())['secure_url'];
+        if ($request->hasFile('image_file')) {
+            $uploaded  = cloudinary()->uploadApi()->upload(
+                $request->file('image_file')->getRealPath(),
+                ['folder' => 'products']
+            );
+            $imagePath = $uploaded['secure_url'];
 
         } elseif ($request->filled('image_url')) {
-            $url = $request->input('image_url');
-
-            // ✅ FIX #1: Block SSRF — only allow http/https and reject private/internal IPs
+            $url    = $request->input('image_url');
             $parsed = parse_url($url);
 
             if (!isset($parsed['scheme']) || !in_array(strtolower($parsed['scheme']), ['http', 'https'])) {
@@ -142,19 +138,16 @@ class AdminController extends Controller
 
             $host = strtolower($parsed['host'] ?? '');
 
-            // Block localhost and loopback
             if (in_array($host, ['localhost', '127.0.0.1', '::1'])) {
                 return back()->withInput()->withErrors(['image_url' => 'This URL is not allowed.']);
             }
 
-            // Block private IP ranges (IPv4)
             if (filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
                 if (!filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
                     return back()->withInput()->withErrors(['image_url' => 'Private or reserved IP addresses are not allowed.']);
                 }
             }
 
-            // Block internal hostnames (no dots = likely internal, e.g. "intranet", "metadata")
             if (strpos($host, '.') === false) {
                 return back()->withInput()->withErrors(['image_url' => 'This URL is not allowed.']);
             }
@@ -162,11 +155,10 @@ class AdminController extends Controller
             $response = Http::timeout(15)->get($url);
 
             if ($response->successful()) {
-                $contentType = $response->header('Content-Type');
-
-                // ✅ FIX #1 (continued): Validate the response is actually an image
+                $contentType  = $response->header('Content-Type');
                 $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
                 $isValidImage = false;
+
                 foreach ($allowedTypes as $type) {
                     if (str_contains(strtolower($contentType), $type)) {
                         $isValidImage = true;
@@ -178,38 +170,28 @@ class AdminController extends Controller
                     return back()->withInput()->withErrors(['image_url' => 'URL did not return a valid image.']);
                 }
 
-                $extension = match (true) {
-                    str_contains($contentType, 'jpeg') => 'jpg',
-                    str_contains($contentType, 'png')  => 'png',
-                    str_contains($contentType, 'gif')  => 'gif',
-                    str_contains($contentType, 'webp') => 'webp',
-                    default => pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'jpg',
-                };
-
-                $filename = Str::uuid() . '.' . $extension;
-                file_put_contents(public_path('images/' . $filename), $response->body());
-                $imagePath = $filename;
+                // ✅ Upload the URL directly to Cloudinary instead of saving locally
+                $uploaded  = cloudinary()->uploadApi()->upload($url, ['folder' => 'products']);
+                $imagePath = $uploaded['secure_url'];
 
             } else {
-                return back()
-                    ->withInput()
-                    ->withErrors(['image_url' => 'Failed to download image. Check the URL and try again.']);
+                return back()->withInput()->withErrors(['image_url' => 'Failed to download image. Check the URL and try again.']);
             }
         }
 
         Product::create([
-            'name'        => $request->name,
-            'carton_price'       => $request->carton_price,
-            'piece_price'       => $request->piece_price,            
-            'description' => $request->description,
-            'category_id' => $request->category_id,
-            'image'       => $imagePath,
+            'name'         => $request->name,
+            'carton_price' => $request->carton_price,
+            'piece_price'  => $request->piece_price,
+            'description'  => $request->description,
+            'category_id'  => $request->category_id,
+            'image'        => $imagePath,
         ]);
 
         return redirect('/admin/products')->with('success', 'Product saved successfully!');
     }
 
-    public function edit(int$id)
+    public function edit(int $id)
     {
         if ($redirect = $this->checkAuth()) return $redirect;
         $product    = Product::findOrFail($id);
@@ -217,50 +199,66 @@ class AdminController extends Controller
         return view('admin.edit', compact('product', 'categories'));
     }
 
-    public function update(Request $request, int$id)
+    public function update(Request $request, int $id)
     {
         if ($redirect = $this->checkAuth()) return $redirect;
 
-        // ✅ FIX #5: Added missing validation (was completely absent before)
         $request->validate([
-            'name'        => 'required|string|max:255',
-            'carton_price'       => 'required|numeric|min:0',
-            'piece_price'       => 'required|numeric|min:0',                
-            'description' => 'nullable|string',
-            'category_id' => 'required|exists:categories,id',
-            'image'       => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'name'         => 'required|string|max:255',
+            'carton_price' => 'required|numeric|min:0',
+            'piece_price'  => 'required|numeric|min:0',
+            'description'  => 'nullable|string',
+            'category_id'  => 'required|exists:categories,id',
+            'image'        => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
         ]);
 
         $product = Product::findOrFail($id);
 
-     if ($request->hasFile('image')) {
-    $product->image = cloudinary()->uploadApi()->upload($request->file('image')->getRealPath())['secure_url'];
-}
+        $data = [
+            'name'         => $request->name,
+            'carton_price' => $request->carton_price,
+            'piece_price'  => $request->piece_price,
+            'description'  => $request->description,
+            'category_id'  => $request->category_id,
+        ];
 
-        $product->update([
-            'name'        => $request->name,
-            'carton_price'       => $request->carton_price,
-            'piece_price'       => $request->piece_price,              
-            'description' => $request->description,
-            'category_id' => $request->category_id,
-        ]);
+        // ✅ Upload new image and include in update data
+        if ($request->hasFile('image')) {
+            $uploaded      = cloudinary()->uploadApi()->upload(
+                $request->file('image')->getRealPath(),
+                ['folder' => 'products']
+            );
+            $data['image'] = $uploaded['secure_url'];
+        }
+
+        $product->update($data);
 
         return redirect('/admin/products')->with('success', 'Product Updated');
     }
 
-    public function delete(int$id)
+    public function delete(int $id)
     {
         if ($redirect = $this->checkAuth()) return $redirect;
 
         $product = Product::findOrFail($id);
 
-        // ✅ FIX #8: Safe file deletion with error suppression
-        if ($product->image && file_exists(public_path('images/' . $product->image))) {
-            @unlink(public_path('images/' . $product->image));
+        // ✅ Delete image from Cloudinary (not local disk)
+        if ($product->image) {
+            try {
+                $path        = parse_url($product->image, PHP_URL_PATH);
+                $path        = preg_replace('/\/v\d+\//', '/', $path);
+                $parts       = explode('/upload/', $path);
+                $publicId    = pathinfo($parts[1] ?? '', PATHINFO_FILENAME);
+                $folder      = dirname($parts[1] ?? '');
+                $fullPublicId = trim($folder . '/' . $publicId, '/');
+
+                cloudinary()->uploadApi()->destroy($fullPublicId);
+            } catch (\Exception $e) {
+                // Don't block deletion if Cloudinary cleanup fails
+            }
         }
 
         $product->delete();
-
         return redirect('/admin/products')->with('success', 'Product Deleted');
     }
 
@@ -275,23 +273,21 @@ class AdminController extends Controller
         return view('admin.orders', compact('orders'));
     }
 
-    public function updateOrderStatus(Request $request, int$id)
+    public function updateOrderStatus(Request $request, int $id)
     {
         if ($redirect = $this->checkAuth()) return $redirect;
-        $order = Order::findOrFail($id);
+        $order         = Order::findOrFail($id);
         $order->status = $request->status;
         $order->save();
-
         return back()->with('success', 'Order status updated');
     }
 
-    public function cancelOrder(int$id)
+    public function cancelOrder(int $id)
     {
         if ($redirect = $this->checkAuth()) return $redirect;
-        $order = Order::findOrFail($id);
+        $order         = Order::findOrFail($id);
         $order->status = 'cancelled';
         $order->save();
-
         return back()->with('success', 'Order cancelled');
     }
 
@@ -313,7 +309,6 @@ class AdminController extends Controller
         $request->validate([
             'name'     => 'required|string',
             'email'    => 'required|email|unique:users',
-            // ✅ FIX #10: Stronger password minimum for admin accounts
             'password' => 'required|min:12',
         ]);
 
@@ -327,11 +322,10 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Admin created!');
     }
 
-    public function destroyAdmin(int$id)
+    public function destroyAdmin(int $id)
     {
         if ($redirect = $this->checkAuth()) return $redirect;
 
-        // ✅ FIX #3: Prevent admin from deleting their own account
         if (Auth::id() == $id) {
             return redirect()->back()->with('error', 'You cannot delete your own admin account.');
         }
