@@ -244,69 +244,79 @@ body, html {
 
 /* CATEGORIES */
 .categories {
-    background: linear-gradient(135deg, #E81A8A, #f472b6); /* pink gradient bg */
-    padding: 20px 16px 16px;
-    border-radius: 0; /* full width header */
+    background: linear-gradient(135deg, #E81A8A, #f472b6);
+    padding: 12px;
+    border-radius: 35px;
+    overflow: hidden;
 }
 
-.categories h1 {
-    text-align: center;
-    color: #ffffff;
-    font-size: 28px;
-    font-weight: 700;
-    margin-bottom: 16px;
-}
-
+/* CATEGORY ROW */
 .category-grid {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     gap: 0;
-    /* NO border, NO background on the row */
 }
 
+/* TAB BUTTON */
 .category-card {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 11px 10px;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
+
+    padding: 18px 10px;
+
     text-decoration: none;
     border: none;
-    background: transparent;              /* inactive = no bg, no border */
-    color: rgba(255, 255, 255, 0.85);     /* inactive = soft white text */
-    transition: background 0.18s, color 0.18s;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    background: transparent;
+
+    color: rgba(255,255,255,0.9);
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+
     white-space: nowrap;
 }
 
-/* Active tab — white card floats alone */
+/* ACTIVE TAB */
 .category-card.active {
-    background: #ffffff;
-    color: #E81A8A;          /* pink text on white card */
-    border-radius: 10px;
+    background: #f3dfe7;
+    color: #E81A8A;
+
+    border-radius: 28px;
+
+    padding-top: 22px;
+    padding-bottom: 22px;
 }
 
+/* HOVER */
 .category-card:not(.active):hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: #ffffff;
+    background: rgba(255,255,255,0.12);
+    color: #fff;
 }
 
 document.querySelectorAll('.category-card').forEach(card => {
+
     card.addEventListener('click', function(e) {
+
         e.preventDefault();
-        document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
+
+        document.querySelectorAll('.category-card')
+            .forEach(c => c.classList.remove('active'));
+
         this.classList.add('active');
     });
+
 });
 
-// Set first active on load
-document.querySelector('.category-card')?.classList.add('active');
+/* first tab active on page load */
+document.querySelector('.category-card')
+    ?.classList.add('active');
 
 /* DEALS */
 .featured {
