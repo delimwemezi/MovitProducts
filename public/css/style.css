@@ -243,61 +243,99 @@ body, html {
 }
 
 /* CATEGORIES */
+body {
+    background: #f3d7e3; /* ghost pink page background */
+    font-family: Arial, sans-serif;
+}
+
+/* MAIN CONTAINER */
 .categories {
-    background: linear-gradient(135deg, #E81A8A, #f472b6);
-    padding: 12px;
-    border-radius: 35px;
-    overflow: hidden;
+
+    background: #E81A8A;
+
+    padding: 0 10px;
+
+    border-radius: 40px;
+
+    overflow: visible;
+
+    position: relative;
+}
+
+/* TITLE */
+.categories h1 {
+
+    text-align: center;
+
+    color: white;
+
+    font-size: 28px;
+
+    font-weight: 700;
+
+    padding-top: 18px;
+
+    margin-bottom: 18px;
 }
 
 /* CATEGORY ROW */
 .category-grid {
+
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0;
+
+    align-items: flex-end;
 }
 
-/* TAB BUTTON */
+/* NORMAL CATEGORY */
 .category-card {
+
     flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+
+    text-align: center;
+
+    text-decoration: none;
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: 700;
 
     padding: 18px 10px;
 
-    text-decoration: none;
-    border: none;
-    background: transparent;
+    position: relative;
 
-    color: rgba(255,255,255,0.9);
+    z-index: 1;
 
-    font-size: 14px;
-    font-weight: 700;
-
-    cursor: pointer;
-
-    transition: all 0.2s ease;
-
-    white-space: nowrap;
+    transition: 0.2s ease;
 }
 
-/* ACTIVE TAB */
+/* ACTIVE CATEGORY */
 .category-card.active {
-    background: #f3dfe7;
+
+    background: #f3d7e3; /* SAME as page background */
+
     color: #E81A8A;
 
-    border-radius: 28px;
+    border-top-left-radius: 40px;
 
-    padding-top: 22px;
+    border-top-right-radius: 40px;
+
+    padding-top: 26px;
+
     padding-bottom: 22px;
+
+    margin-top: -18px;
+
+    z-index: 5;
 }
 
 /* HOVER */
-.category-card:not(.active):hover {
-    background: rgba(255,255,255,0.12);
-    color: #fff;
+.category-card:hover:not(.active) {
+
+    background: rgba(255,255,255,0.1);
+
+    border-radius: 30px;
 }
 
 document.querySelectorAll('.category-card').forEach(card => {
@@ -310,11 +348,12 @@ document.querySelectorAll('.category-card').forEach(card => {
             .forEach(c => c.classList.remove('active'));
 
         this.classList.add('active');
+
     });
 
 });
 
-/* first tab active on page load */
+/* default active */
 document.querySelector('.category-card')
     ?.classList.add('active');
 
