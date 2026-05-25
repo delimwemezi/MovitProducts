@@ -69,7 +69,8 @@
 <div class="form-container">
     <h1>Edit Product</h1>
 
-    <form method="POST" action="/admin/products/update/{{ $product->id }}">
+    <form method="POST" action="/admin/products/update/{{ $product->id }}"
+    enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
