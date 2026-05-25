@@ -247,42 +247,71 @@ body, html {
     margin-top: 20px;
     text-align: center;
 }
-
 .categories h1 {
     margin-bottom: 10px;
     color: #E81A8A;
 }
-
 .category-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1px;
-}
-
-.category-card {
-    /*background: url('../images/background.webp'); 
-    background-size: cover;      
-    background-position: center;  
-    background-repeat: no-repeat;*/
-
-    background-color: white;
-
-    padding: 25px;
+    display: flex;
     border-radius: 10px;
-    font-weight: bold;
-    transition: 0.3s;
+    overflow: hidden;
+    border: 1px solid rgba(232, 26, 138, 0.2);
+    position: relative;
+}
+.category-card {
+    flex: 1;
+    position: relative;
+    padding: 14px 10px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
-    height: 24px;
-    margin-bottom: 20px;
-
     text-decoration: none;
     color: #E81A8A;
+    background: white;
+    border-right: 1px solid rgba(232, 26, 138, 0.15);
+    transition: color 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.category-card:last-child {
+    border-right: none;
 }
 
-.category-card:hover {
-    
-    transform: translateY(-5px);
+/* Opaque overlay on all inactive cards */
+.category-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(232, 26, 138, 0.08);
+    pointer-events: none;
+    transition: opacity 0.2s;
 }
+.category-card:hover::before {
+    background: rgba(232, 26, 138, 0.15);
+}
+
+/* Active/clicked card — overlay removed */
+.category-card.active::before {
+    opacity: 0;
+}
+.category-card.active {
+    font-weight: 600;
+    box-shadow: inset 0 -2.5px 0 #E81A8A;
+}
+
+// Add this JS to activate the clicked category
+document.querySelectorAll('.category-card').forEach(card => {
+    card.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelectorAll('.category-card').forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
+    });
+});
+
+// Set first one active by default
+document.querySelector('.category-card')?.classList.add('active');
 
 /* DEALS */
 .featured {
