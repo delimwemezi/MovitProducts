@@ -243,63 +243,60 @@ body, html {
 }
 
 /* CATEGORIES */
-/* Wrap your categories section in a colored/image background */
 .categories {
-     margin-bottom: 12px;
-    background: linear-gradient(160deg, #c8882a, #8a5a10); /* or your bg image */
-    padding: 20px 16px;
-    border-radius: 16px;
-    margin-bottom: 12px;
+    background: linear-gradient(135deg, #E81A8A, #f472b6); /* pink gradient bg */
+    padding: 20px 16px 16px;
+    border-radius: 0; /* full width header */
 }
 
 .categories h1 {
-    margin-bottom: 12px;
-    color: #fff;
+    text-align: center;
+    color: #ffffff;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 16px;
 }
 
 .category-grid {
     display: flex;
+    align-items: center;
+    justify-content: center;
     gap: 0;
-    border-radius: 12px;
-    overflow: hidden;
-    position: relative;
+    /* NO border, NO background on the row */
 }
 
-/* All tabs — transparent on the background */
 .category-card {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    padding: 13px 10px;
-    border-radius: 12px;
-    font-size: 14px;
+    padding: 11px 10px;
+    border-radius: 10px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
     text-decoration: none;
-    color: rgba(255, 255, 255, 0.85);
-    background: transparent;
-    transition: all 0.22s ease;
+    border: none;
+    background: transparent;              /* inactive = no bg, no border */
+    color: rgba(255, 255, 255, 0.85);     /* inactive = soft white text */
+    transition: background 0.18s, color 0.18s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     white-space: nowrap;
 }
 
-/* Hover on inactive */
-.category-card:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: #fff;
-    transform: none; /* remove the old translateY */
-}
-
-/* Active/selected tab — white card pops out */
+/* Active tab — white card floats alone */
 .category-card.active {
     background: #ffffff;
-    color: #1a1a1a;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
-    border-radius: 12px;
+    color: #E81A8A;          /* pink text on white card */
+    border-radius: 10px;
 }
 
-// JS to handle active tab switching
+.category-card:not(.active):hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+}
+
 document.querySelectorAll('.category-card').forEach(card => {
     card.addEventListener('click', function(e) {
         e.preventDefault();
@@ -308,7 +305,7 @@ document.querySelectorAll('.category-card').forEach(card => {
     });
 });
 
-// Set first tab active on load
+// Set first active on load
 document.querySelector('.category-card')?.classList.add('active');
 
 /* DEALS */
