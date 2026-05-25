@@ -101,8 +101,48 @@
             @endforeach
         </select>
 
+          <!-- ✅ Image Upload with Cloudinary URL preview -->
+    <label>Product Image</label>
+
+    @if($product->image)
+        <div style="margin-bottom: 10px;">
+            <p style="font-size: 13px; color: #555;">Current image:</p>
+            <img id="current-preview"
+                 src="{{ $product->image }}"
+                 alt="Current product image"
+                 style="width: 100%; max-height: 220px; object-fit: cover;
+                        border-radius: 8px; border: 1px solid #ddd;">
+        </div>
+    @endif
+
+    <input type="file" name="image" id="image-input" accept="image/*">
+
+    <img id="new-preview" src="#" alt="New image preview"
+         style="display:none; width: 100%; max-height: 220px;
+                object-fit: cover; border-radius: 8px;
+                border: 2px dashed #007bff; margin-bottom: 15px;">
+
+
         <button type="submit">Update Product</button>
     </form>
+
+    <script>
+    document.getElementById('image-input').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (evt) {
+            const newPreview = document.getElementById('new-preview');
+            newPreview.src = evt.target.result;
+            newPreview.style.display = 'block';
+
+            const current = document.getElementById('current-preview');
+            if (current) current.style.opacity = '0.4';
+        };
+        reader.readAsDataURL(file);
+    });
+</script>
     <a href="/admin/logout" class="logout-btn">🚪 Logout</a>
 </div>
 
