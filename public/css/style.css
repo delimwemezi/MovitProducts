@@ -120,7 +120,7 @@ a {
    5. HERO
 ════════════════════════════════ */
 .hero {
-    background: url('../images/background\ 05.jpg') center/cover no-repeat;
+    background: url('../images/background 05.jpg') center/cover no-repeat;
     padding: 120px 20px 60px;
     text-align: center;
     color: #E81A8A;
@@ -225,7 +225,6 @@ a {
 /* active tab — ghost pink oval rising above the bar */
 .category-card.active {
     background: #f3d7e3;
-    color: #E81A8A;
     border-radius: 999px;
     padding: 22px 20px;
     margin-bottom: 6px;
