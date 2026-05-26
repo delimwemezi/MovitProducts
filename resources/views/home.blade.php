@@ -16,8 +16,8 @@
     </section>
 
     <!-- CATEGORIES -->
+    <h2 class="categories-title">Categories</h2>    
     <section class="categories">
-        <h1>Categories</h1>
         <div class="category-grid">
             @foreach($categories as $category)
                 <a href="/products?category={{ $category->id }}" class="category-card">
