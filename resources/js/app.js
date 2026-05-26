@@ -1,11 +1,16 @@
 import './bootstrap';
 // app.js
 
-/* ═══════════════════════════════════════════════════════════
-   MOVIT BEAUTY STORE — main.js
+document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', function () {
+        this.classList.toggle('active');
+    });
+});
+
+
+  /* MOVIT BEAUTY STORE — main.js
    All JavaScript for the entire site
 ═══════════════════════════════════════════════════════════ */
-
 document.addEventListener('DOMContentLoaded', function () {
 
     /* ════════════════════════════════
