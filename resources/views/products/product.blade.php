@@ -11,16 +11,21 @@
 </form>
      
        <!-- CATEGORIES -->
-    <section class="categories">
-        <h1>Categories</h1>
+   <section class="categories">
+    <h1>Categories</h1>
+    <div class="category-grid-wrapper">
         <div class="category-grid">
             @foreach($categories as $category)
                 <a href="/products?category={{ $category->id }}" class="category-card">
-                    {{ $category->name }}
+                    <div class="category-icon">
+                        <i class="ti ti-tag" aria-hidden="true"></i>
+                    </div>
+                    <span class="category-label">{{ $category->name }}</span>
                 </a>
             @endforeach
         </div>
-    </section>
+    </div>
+</section>
 
     <!-- PRODUCTS -->
     <div class="products">
