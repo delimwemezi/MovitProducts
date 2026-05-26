@@ -16,16 +16,21 @@
     </section>
 
     <!-- CATEGORIES -->
-    <h2 class="categories-title">Categories</h2>    
-    <section class="categories">
+<section class="categories">
+    <h1>Categories</h1>
+    <div class="category-grid-wrapper">
         <div class="category-grid">
             @foreach($categories as $category)
                 <a href="/products?category={{ $category->id }}" class="category-card">
-                    {{ $category->name }}
+                    <div class="category-icon">
+                        <i class="ti ti-{{ $category->icon ?? 'tag' }}" aria-hidden="true"></i>
+                    </div>
+                    <span class="category-label">{{ $category->name }}</span>
                 </a>
             @endforeach
         </div>
-    </section>
+    </div>
+</section>
 
     <!-- FEATURED / DEALS -->
     <section class="featured">
