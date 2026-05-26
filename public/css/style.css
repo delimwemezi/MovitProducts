@@ -250,7 +250,6 @@ body, html {
 }
 
 /* CATEGORIES */
-/* CATEGORIES */
 .categories {
     margin-top: 15px;
     text-align: center;
@@ -263,7 +262,7 @@ body, html {
 .category-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 0px;
+    gap: 4px;
 }
 .category-card {
     background: #ffffff;
@@ -271,11 +270,13 @@ body, html {
     padding: 20px 16px;
     border-radius: 12px;
     cursor: pointer;
+    color: #E81A8A;
+    font-weight: 700;
     text-decoration: none;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
+    gap: 0px;
     transition: transform 0.2s ease, background 0.2s ease;
 }
 .category-card:hover {
