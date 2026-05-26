@@ -271,7 +271,7 @@ body, html {
     padding: 20px 16px;
     border-radius: 12px;
     cursor: pointer;
-    color: #E81A8A;
+    color: pink;
     font-weight: 700;
     text-decoration: none;
     display: flex;
@@ -290,6 +290,7 @@ body, html {
     border-radius: 14px;
 }
 .category-card:active {
+    background: #fff0f7;
     transform: translateY(-4px) scale(1.02);
     box-shadow: 0 6px 16px rgba(232, 26, 138, 0.2);
 }
