@@ -254,7 +254,7 @@ body, html {
     color: #E81A8A;
 }
 .category-grid-wrapper {
-    background:  #fff0f7;
+    background:  #ffffff;
     border-radius: 16px;
     padding: 12px;
     box-shadow: 0 2px 12px rgba(232, 26, 138, 0.08);
@@ -283,7 +283,7 @@ body, html {
     z-index: 0;
 }
 .category-card:hover {
-    background: #ffffff;
+    background: #fffafa;
     transform: translateY(-8px) scale(1.04);
     box-shadow: 0 12px 32px rgba(232, 26, 138, 0.15);
     z-index: 10; /* pops above the wrapper */
