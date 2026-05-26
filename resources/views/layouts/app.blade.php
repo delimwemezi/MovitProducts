@@ -37,15 +37,8 @@
     </main>
 
     @include('footer')          {{-- footer once here --}}
+        <script src="{{ asset('js/app.js') }}" defer></script>
     @stack('scripts')
-
-     <script>
-    document.querySelectorAll('.card').forEach(card => {
-        card.addEventListener('click', function () {
-            this.classList.toggle('active');
-        });
-    });
-</script>
 
 </body>
 </html>
