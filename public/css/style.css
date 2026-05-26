@@ -252,8 +252,9 @@ body, html {
 /* CATEGORIES */
 /* CATEGORIES */
 .categories {
-    margin-top: 20px;
+    margin-top: 15px;
     text-align: center;
+    margin-top: 10px;
 }
 .categories h1 {
     margin-bottom: 10px;
@@ -262,7 +263,7 @@ body, html {
 .category-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 12px;
+    gap: 0px;
 }
 .category-card {
     background: #ffffff;
