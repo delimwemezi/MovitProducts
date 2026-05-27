@@ -27,9 +27,6 @@
             <div class="category-grid">
                 @foreach($categories as $category)
                     <a href="/products?category={{ $category->id }}" class="category-card">
-                        <div class="category-icon">
-                            <i class="ti ti-{{ $category->icon ?? 'tag' }}" aria-hidden="true"></i>
-                        </div>
                         <span class="category-label">{{ $category->name }}</span>
                     </a>
                 @endforeach
