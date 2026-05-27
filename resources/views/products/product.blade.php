@@ -32,6 +32,14 @@
         </div>
     </div>
 </section>
+    
+    <script>
+    const trigger = document.getElementById('categoryTrigger');
+    trigger.addEventListener('click', () => trigger.classList.toggle('open'));
+    document.addEventListener('click', e => {
+        if (!trigger.contains(e.target)) trigger.classList.remove('open');
+    });
+</script>
 
     <!-- PRODUCTS -->
     <div class="products">
@@ -61,10 +69,4 @@
 
 @include('partials.alerts')
 @endsection
-<script>
-    const trigger = document.getElementById('categoryTrigger');
-    trigger.addEventListener('click', () => trigger.classList.toggle('open'));
-    document.addEventListener('click', e => {
-        if (!trigger.contains(e.target)) trigger.classList.remove('open');
-    });
-</script>
+
