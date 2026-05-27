@@ -68,5 +68,13 @@
             <a href="/products" class="btn-small">Explore Now</a>
         </div>
     </section>
+
+<script>
+    const trigger = document.getElementById('categoryTrigger');
+    trigger.addEventListener('click', () => trigger.classList.toggle('open'));
+    document.addEventListener('click', e => {
+        if (!trigger.contains(e.target)) trigger.classList.remove('open');
+    });
+</script>
 @include('partials.alerts')
 @endsection
