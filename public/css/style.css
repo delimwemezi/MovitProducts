@@ -290,7 +290,7 @@ body, html {
     left: 50%;
     transform: translateX(-50%) scaleY(0.92);
     transform-origin: top center;
-    width: 560px;
+    width: 220px;
     background: #ffffff;
     border-radius: 16px;
     padding: 12px;
@@ -307,7 +307,7 @@ body, html {
 }
 .category-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: 1fr;
     gap: 4px;
     overflow: visible;
 }
