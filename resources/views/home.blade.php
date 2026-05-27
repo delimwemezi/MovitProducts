@@ -17,17 +17,23 @@
 
     <!-- CATEGORIES -->
 <section class="categories">
-    <h1>Categories</h1>
-    <div class="category-grid-wrapper">
-        <div class="category-grid">
-            @foreach($categories as $category)
-                <a href="/products?category={{ $category->id }}" class="category-card">
-                    <div class="category-icon">
-                        <i class="ti ti-{{ $category->icon ?? 'tag' }}" aria-hidden="true"></i>
-                    </div>
-                    <span class="category-label">{{ $category->name }}</span>
-                </a>
-            @endforeach
+    <div class="category-trigger-wrapper" id="categoryTrigger">
+        <h1>Categories</h1>
+        <span class="dropdown-arrow">
+            <i class="ti ti-chevron-down" aria-hidden="true"></i>
+        </span>
+
+        <div class="category-dropdown">
+            <div class="category-grid">
+                @foreach($categories as $category)
+                    <a href="/products?category={{ $category->id }}" class="category-card">
+                        <div class="category-icon">
+                            <i class="ti ti-{{ $category->icon ?? 'tag' }}" aria-hidden="true"></i>
+                        </div>
+                        <span class="category-label">{{ $category->name }}</span>
+                    </a>
+                @endforeach
+            </div>
         </div>
     </div>
 </section>
