@@ -24,7 +24,7 @@ class AdminController extends Controller
             return redirect('/admin/login');
         }
 
-        $timeout = 5 * 60;
+        $timeout = 15 * 60;
 
         if (session('last_activity') && (time() - session('last_activity') > $timeout)) {
             Auth::logout();
