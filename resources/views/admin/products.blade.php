@@ -141,8 +141,12 @@
 
     <!-- IMAGE -->
     <td>
-        @if($product->image)
-            <img src="{{ asset('images/' . $product->image) }}" width="70" height="70" style="object-fit:cover;">
+        @if($product->primaryImage)
+            {{-- ✅ NEW: Display image from MySQL --}}
+            <img src="{{ route('product.image', $product->primaryImage->id) }}" width="70" height="70" style="object-fit:cover;">
+        @elseif($product->image)
+            {{-- Fallback to Cloudinary URL for existing products --}}
+            <img src="{{ $product->image }}" width="70" height="70" style="object-fit:cover;">
         @else
             <span class="badge">No Image</span>
         @endif
