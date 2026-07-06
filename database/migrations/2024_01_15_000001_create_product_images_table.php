@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('product_images', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
-            $table->longBlob('image_data');                    // ← Binary image data stored in DB
+            $table->binary('image_data');                     // Binary image data stored in DB
             $table->string('mime_type');                       // e.g., 'image/jpeg', 'image/png'
             $table->string('original_filename');               // Original file name
             $table->unsignedBigInteger('file_size');          // Size in bytes
@@ -25,6 +25,9 @@ return new class extends Migration
             // Index for faster lookups
             $table->index('product_id');
         });
+
+        // Alter to LONGBLOB for large image storage (BLOB is limited to ~64KB)
+        \Illuminate\Support\Facades\DB::statement('ALTER TABLE product_images MODIFY image_data LONGBLOB');
     }
 
     /**
