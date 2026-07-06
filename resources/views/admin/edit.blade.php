@@ -79,12 +79,12 @@
 
         <div class="form-group">
     <label for="carton_price">Carton Price</label>
-    <input type="number" name="carton_price" id="carton_price" placeholder="Carton Price" step="0.01" min="0" required>
+    <input type="number" name="carton_price" id="carton_price" placeholder="Carton Price" step="0.01" min="0" required value="{{ $product->carton_price }}">
 </div>
 
 <div class="form-group">
     <label for="piece_price">Piece Price</label>
-    <input type="number" name="piece_price" id="piece_price" placeholder="Piece Price" step="0.01" min="0" required>
+    <input type="number" name="piece_price" id="piece_price" placeholder="Piece Price" step="0.01" min="0" required value="{{ $product->piece_price }}">
 </div>
 
         <label>Description</label>
@@ -102,12 +102,23 @@
             @endforeach
         </select>
 
-          <!-- ✅ Image Upload with Cloudinary URL preview -->
+          <!-- ✅ Image Upload - displays current MySQL or Cloudinary image -->
     <label>Product Image</label>
 
-    @if($product->image)
+    @if($product->primaryImage)
+        {{-- NEW: Show image from MySQL --}}
         <div style="margin-bottom: 10px;">
-            <p style="font-size: 13px; color: #555;">Current image:</p>
+            <p style="font-size: 13px; color: #555;">Current image (MySQL):</p>
+            <img id="current-preview"
+                 src="{{ route('product.image', $product->primaryImage->id) }}"
+                 alt="Current product image"
+                 style="width: 100%; max-height: 220px; object-fit: cover;
+                        border-radius: 8px; border: 1px solid #ddd;">
+        </div>
+    @elseif($product->image)
+        {{-- Fallback: Show existing Cloudinary image --}}
+        <div style="margin-bottom: 10px;">
+            <p style="font-size: 13px; color: #555;">Current image (Cloudinary):</p>
             <img id="current-preview"
                  src="{{ $product->image }}"
                  alt="Current product image"
