@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\Order;
 use App\Models\Category;
 use App\Models\User;
@@ -116,77 +117,30 @@ class AdminController extends Controller
             'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
             'image_file'  => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'image_url'   => 'nullable|url',
         ]);
 
-        $imagePath = null;
-
-        if ($request->hasFile('image_file')) {
-            $uploaded  = cloudinary()->uploadApi()->upload(
-                $request->file('image_file')->getRealPath(),
-                ['folder' => 'products']
-            );
-            $imagePath = $uploaded['secure_url'];
-
-        } elseif ($request->filled('image_url')) {
-            $url    = $request->input('image_url');
-            $parsed = parse_url($url);
-
-            if (!isset($parsed['scheme']) || !in_array(strtolower($parsed['scheme']), ['http', 'https'])) {
-                return back()->withInput()->withErrors(['image_url' => 'Only http and https URLs are allowed.']);
-            }
-
-            $host = strtolower($parsed['host'] ?? '');
-
-            if (in_array($host, ['localhost', '127.0.0.1', '::1'])) {
-                return back()->withInput()->withErrors(['image_url' => 'This URL is not allowed.']);
-            }
-
-            if (filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-                if (!filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
-                    return back()->withInput()->withErrors(['image_url' => 'Private or reserved IP addresses are not allowed.']);
-                }
-            }
-
-            if (strpos($host, '.') === false) {
-                return back()->withInput()->withErrors(['image_url' => 'This URL is not allowed.']);
-            }
-
-            $response = Http::timeout(15)->get($url);
-
-            if ($response->successful()) {
-                $contentType  = $response->header('Content-Type');
-                $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-                $isValidImage = false;
-
-                foreach ($allowedTypes as $type) {
-                    if (str_contains(strtolower($contentType), $type)) {
-                        $isValidImage = true;
-                        break;
-                    }
-                }
-
-                if (!$isValidImage) {
-                    return back()->withInput()->withErrors(['image_url' => 'URL did not return a valid image.']);
-                }
-
-                // ✅ Upload the URL directly to Cloudinary instead of saving locally
-                $uploaded  = cloudinary()->uploadApi()->upload($url, ['folder' => 'products']);
-                $imagePath = $uploaded['secure_url'];
-
-            } else {
-                return back()->withInput()->withErrors(['image_url' => 'Failed to download image. Check the URL and try again.']);
-            }
-        }
-
-        Product::create([
+        // Create the product
+        $product = Product::create([
             'name'         => $request->name,
             'carton_price' => $request->carton_price,
             'piece_price'  => $request->piece_price,
             'description'  => $request->description,
             'category_id'  => $request->category_id,
-            'image'        => $imagePath,
         ]);
+
+        // ✅ NEW: Store image in MySQL instead of Cloudinary
+        if ($request->hasFile('image_file')) {
+            $file = $request->file('image_file');
+            
+            ProductImage::create([
+                'product_id'        => $product->id,
+                'image_data'        => file_get_contents($file->getRealPath()),
+                'mime_type'         => $file->getMimeType(),
+                'original_filename' => $file->getClientOriginalName(),
+                'file_size'         => $file->getSize(),
+                'is_cloudinary'     => false,
+            ]);
+        }
 
         return redirect('/admin/products')->with('success', 'Product saved successfully!');
     }
@@ -222,13 +176,18 @@ class AdminController extends Controller
             'category_id'  => $request->category_id,
         ];
 
-        // ✅ Upload new image and include in update data
+        // ✅ NEW: Store new image in MySQL
         if ($request->hasFile('image')) {
-            $uploaded      = cloudinary()->uploadApi()->upload(
-                $request->file('image')->getRealPath(),
-                ['folder' => 'products']
-            );
-            $data['image'] = $uploaded['secure_url'];
+            $file = $request->file('image');
+            
+            ProductImage::create([
+                'product_id'        => $product->id,
+                'image_data'        => file_get_contents($file->getRealPath()),
+                'mime_type'         => $file->getMimeType(),
+                'original_filename' => $file->getClientOriginalName(),
+                'file_size'         => $file->getSize(),
+                'is_cloudinary'     => false,
+            ]);
         }
 
         $product->update($data);
@@ -242,23 +201,9 @@ class AdminController extends Controller
 
         $product = Product::findOrFail($id);
 
-        // ✅ Delete image from Cloudinary (not local disk)
-        if ($product->image) {
-            try {
-                $path        = parse_url($product->image, PHP_URL_PATH);
-                $path        = preg_replace('/\/v\d+\//', '/', $path);
-                $parts       = explode('/upload/', $path);
-                $publicId    = pathinfo($parts[1] ?? '', PATHINFO_FILENAME);
-                $folder      = dirname($parts[1] ?? '');
-                $fullPublicId = trim($folder . '/' . $publicId, '/');
-
-                cloudinary()->uploadApi()->destroy($fullPublicId);
-            } catch (\Exception $e) {
-                // Don't block deletion if Cloudinary cleanup fails
-            }
-        }
-
+        // ✅ Delete will cascade via foreign key - product_images will be auto-deleted
         $product->delete();
+
         return redirect('/admin/products')->with('success', 'Product Deleted');
     }
 

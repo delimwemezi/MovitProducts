@@ -9,6 +9,8 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductImageController;
+
 // ============================
 // FRONTEND
 // ============================
@@ -19,6 +21,9 @@ Route::get('/remove-from-cart/{id}', [ProductController::class, 'removeFromCart'
 Route::get('/cart', function () { return view('cart'); });
 Route::get('/checkout', function () { return view('checkout'); });
 Route::post('/place-order', [OrderController::class, 'store']);
+
+// ✅ NEW: Product image route - serve images from database
+Route::get('/product-image/{imageId}', [ProductImageController::class, 'show'])->name('product.image');
 
 // ADMIN
 // ============================

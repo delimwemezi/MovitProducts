@@ -43,7 +43,8 @@
         @foreach($products as $product)
     <div class="card">
       <div class="card-img">
-       <img src="{{ $product->image }}" alt="{{ $product->name }}">
+       {{-- ✅ NEW: Use image_url accessor that handles both MySQL and Cloudinary --}}
+       <img src="{{ $product->image_url }}" alt="{{ $product->name }}">
       </div>
       <div class="card-body">
         <h3>{{ $product->name }}</h3>
@@ -66,4 +67,3 @@
 
 @include('partials.alerts')
 @endsection
-
