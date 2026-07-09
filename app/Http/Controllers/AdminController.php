@@ -95,7 +95,7 @@ class AdminController extends Controller
     public function products()
     {
         if ($redirect = $this->checkAuth()) return $redirect;
-        $products = Product::all();
+        $products = Product::with('primaryImage')->get();  // ✅ Eager-load images
         return view('admin.products', compact('products'));
     }
 
@@ -104,6 +104,46 @@ class AdminController extends Controller
         if ($redirect = $this->checkAuth()) return $redirect;
         $categories = Category::all();
         return view('admin.create', compact('categories'));
+    }
+
+    /**
+     * Helper: Save image from file or URL to database
+     */
+    private function saveProductImage($product, $imageFile = null, $imageUrl = null)
+    {
+        // Priority: file upload > URL
+        if ($imageFile) {
+            ProductImage::create([
+                'product_id'        => $product->id,
+                'image_data'        => file_get_contents($imageFile->getRealPath()),
+                'mime_type'         => $imageFile->getMimeType(),
+                'original_filename' => $imageFile->getClientOriginalName(),
+                'file_size'         => $imageFile->getSize(),
+                'is_cloudinary'     => false,
+            ]);
+        } elseif ($imageUrl) {
+            try {
+                // Download image from URL
+                $response = Http::get($imageUrl);
+                if ($response->successful()) {
+                    $imageData = $response->body();
+                    $mimeType = $response->header('Content-Type') ?? 'image/jpeg';
+                    $filename = basename(parse_url($imageUrl, PHP_URL_PATH)) ?: 'image.jpg';
+                    
+                    ProductImage::create([
+                        'product_id'        => $product->id,
+                        'image_data'        => $imageData,
+                        'mime_type'         => $mimeType,
+                        'original_filename' => $filename,
+                        'file_size'         => strlen($imageData),
+                        'is_cloudinary'     => false,
+                    ]);
+                }
+            } catch (\Exception $e) {
+                // Silently fail - image URL might be invalid
+                \Log::warning("Failed to download image from URL: {$imageUrl}", ['error' => $e->getMessage()]);
+            }
+        }
     }
 
     public function store(Request $request)
@@ -130,19 +170,12 @@ class AdminController extends Controller
             'image'        => $request->image_url,
         ]);
 
-        // ✅ NEW: Store image in MySQL instead of Cloudinary
-        if ($request->hasFile('image_file')) {
-            $file = $request->file('image_file');
-            
-            ProductImage::create([
-                'product_id'        => $product->id,
-                'image_data'        => file_get_contents($file->getRealPath()),
-                'mime_type'         => $file->getMimeType(),
-                'original_filename' => $file->getClientOriginalName(),
-                'file_size'         => $file->getSize(),
-                'is_cloudinary'     => false,
-            ]);
-        }
+        // ✅ Save image from file OR URL
+        $this->saveProductImage(
+            $product,
+            $request->file('image_file'),
+            $request->input('image_url')
+        );
 
         return redirect('/admin/products')->with('success', 'Product saved successfully!');
     }
@@ -150,7 +183,7 @@ class AdminController extends Controller
     public function edit(int $id)
     {
         if ($redirect = $this->checkAuth()) return $redirect;
-        $product    = Product::findOrFail($id);
+        $product    = Product::with('primaryImage')->findOrFail($id);  // ✅ Eager-load image
         $categories = Category::all();
         return view('admin.edit', compact('product', 'categories'));
     }
@@ -178,18 +211,9 @@ class AdminController extends Controller
             'category_id'  => $request->category_id,
         ];
 
-        // ✅ NEW: Store new image in MySQL
+        // ✅ Store new image in MySQL if provided
         if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            
-            ProductImage::create([
-                'product_id'        => $product->id,
-                'image_data'        => file_get_contents($file->getRealPath()),
-                'mime_type'         => $file->getMimeType(),
-                'original_filename' => $file->getClientOriginalName(),
-                'file_size'         => $file->getSize(),
-                'is_cloudinary'     => false,
-            ]);
+            $this->saveProductImage($product, $request->file('image'));
         }
 
         $product->update($data);
@@ -281,3 +305,4 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Admin removed!');
     }
 }
+
