@@ -9,22 +9,24 @@ class ProductController extends Controller
 {
     // SHOW PRODUCTS (FILTER BY CATEGORY)
     public function index(Request $request)
-{
-    $search     = $request->get('search');
-    $categoryId = $request->get('category');
+    {
+        $search     = $request->get('search');
+        $categoryId = $request->get('category');
 
-    $products = Product::query()
-        ->when($categoryId, function($q) use ($categoryId) {
-            $q->where('category_id', $categoryId); // ← was 'category', must be 'category_id'
-        })
-        ->when($search, function($q) use ($search) {
-            $q->where('name', 'LIKE', "%{$search}%")
-              ->orWhere('description', 'LIKE', "%{$search}%");
-        })
-        ->get();
+        $products = Product::query()
+            ->with('primaryImage')  // ✅ Eager-load primary image
+            ->when($categoryId, function($q) use ($categoryId) {
+                $q->where('category_id', $categoryId);
+            })
+            ->when($search, function($q) use ($search) {
+                $q->where('name', 'LIKE', "%{$search}%")
+                  ->orWhere('description', 'LIKE', "%{$search}%");
+            })
+            ->get();
 
-    $categories = \App\Models\Category::all();
+        $categories = \App\Models\Category::all();
 
-    return view('products.product', compact('products', 'categories')); // ← pass categories too
+        return view('products.product', compact('products', 'categories'));
+    }
 }
-}
+
