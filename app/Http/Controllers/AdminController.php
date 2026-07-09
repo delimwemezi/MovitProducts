@@ -4,11 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Http;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use App\Models\Product;
-use App\Models\ProductImage;
 use App\Models\Order;
 use App\Models\Category;
 use App\Models\User;
@@ -117,42 +113,18 @@ class AdminController extends Controller
             'piece_price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
-            'image_file'  => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120',
             'image_url'   => 'nullable|url',
         ]);
 
-        // Create the product
-        $product = Product::create([
+        // ✅ Create product with Cloudinary URL
+        Product::create([
             'name'         => $request->name,
             'carton_price' => $request->carton_price,
             'piece_price'  => $request->piece_price,
             'description'  => $request->description,
             'category_id'  => $request->category_id,
+            'image'        => $request->input('image_url'),
         ]);
-
-        // ✅ Upload image to Cloudinary
-        $imageUrl = null;
-        
-        if ($request->hasFile('image_file')) {
-            try {
-                $uploadedFile = Cloudinary::upload($request->file('image_file')->getRealPath(), [
-                    'folder' => 'movit-products',
-                    'resource_type' => 'auto',
-                ]);
-                $imageUrl = $uploadedFile->getSecurePath();
-            } catch (\Exception $e) {
-                \Log::error('Cloudinary upload failed: ' . $e->getMessage());
-                return redirect('/admin/products/create')->with('error', 'Image upload failed: ' . $e->getMessage());
-            }
-        } elseif ($request->input('image_url')) {
-            // Use URL directly if provided
-            $imageUrl = $request->input('image_url');
-        }
-
-        // Save image URL to product
-        if ($imageUrl) {
-            $product->update(['image' => $imageUrl]);
-        }
 
         return redirect('/admin/products')->with('success', 'Product saved successfully!');
     }
@@ -175,7 +147,7 @@ class AdminController extends Controller
             'piece_price'  => 'required|numeric|min:0',
             'description'  => 'nullable|string',
             'category_id'  => 'required|exists:categories,id',
-            'image'        => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120',
+            'image_url'    => 'nullable|url',
         ]);
 
         $product = Product::findOrFail($id);
@@ -188,18 +160,9 @@ class AdminController extends Controller
             'category_id'  => $request->category_id,
         ];
 
-        // ✅ Upload new image to Cloudinary if provided
-        if ($request->hasFile('image')) {
-            try {
-                $uploadedFile = Cloudinary::upload($request->file('image')->getRealPath(), [
-                    'folder' => 'movit-products',
-                    'resource_type' => 'auto',
-                ]);
-                $data['image'] = $uploadedFile->getSecurePath();
-            } catch (\Exception $e) {
-                \Log::error('Cloudinary upload failed: ' . $e->getMessage());
-                return redirect("/admin/products/edit/{$id}")->with('error', 'Image upload failed: ' . $e->getMessage());
-            }
+        // ✅ Update image URL if provided
+        if ($request->input('image_url')) {
+            $data['image'] = $request->input('image_url');
         }
 
         $product->update($data);
