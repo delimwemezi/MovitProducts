@@ -1,22 +1,3 @@
-<!---
-<h1>Add Product</h1>
-
-
-    @csrf
-
-    <input type="text" name="name" placeholder="Name"><br><br>
-
-    <input type="number" name="price" placeholder="Price"><br><br>
-
-    <textarea name="description" placeholder="Description"></textarea><br><br>
-
-     IMAGE INPUT -->   <!---
-    <input type="file" name="image"><br><br>
-
-    <button type="submit">Save</button>
-</form>
--->
-
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -49,6 +30,7 @@
         outline: none;
         font-size: 14px;
         transition: 0.3s;
+        box-sizing: border-box;
     }
 
     input:focus, textarea:focus, select:focus {
@@ -133,22 +115,10 @@
             </select>
         </div>
 
-        <!-- IMAGE SOURCE TOGGLE -->
+        <!-- ✅ Simple file upload to Cloudinary -->
         <div class="form-group">
-            <select id="imageSource" onchange="toggleImageSource()">
-                <option value="device">Upload from Device</option>
-                <option value="url">Use Online URL</option>
-            </select>
-        </div>
-
-        <!-- UPLOAD FROM DEVICE -->
-        <div class="form-group" id="deviceUpload">
-            <input type="file" name="image_file" accept="image/*">
-        </div>
-
-        <!-- ONLINE URL -->
-        <div class="form-group" id="urlUpload" style="display:none;">
-            <input type="text" name="image_url" placeholder="https://example.com/image.jpg">
+            <label for="image_file">Product Image</label>
+            <input type="file" name="image_file" id="image_file" accept="image/*">
         </div>
 
         <button type="submit">Save Product</button>
@@ -156,10 +126,3 @@
     <a href="/admin/logout" class="logout-btn">🚪 Logout</a>
 </div>
 
-<script>
-function toggleImageSource() {
-    const source = document.getElementById('imageSource').value;
-    document.getElementById('deviceUpload').style.display = source === 'device' ? 'block' : 'none';
-    document.getElementById('urlUpload').style.display = source === 'url' ? 'block' : 'none';
-}
-</script>

@@ -21,7 +21,7 @@ class HomeController extends Controller
         $search     = $request->get('search');
         $categoryId = $request->get('category');
 
-        $products = Product::with('category')
+        $products = Product::query()
             ->when($categoryId, function($q) use ($categoryId) {
                 $q->where('category_id', $categoryId);
             })
@@ -36,3 +36,4 @@ class HomeController extends Controller
         return view('products.product', compact('products', 'categories'));
     }
 }
+

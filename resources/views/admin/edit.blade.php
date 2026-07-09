@@ -96,43 +96,32 @@
             @foreach(\App\Models\Category::all() as $category)
                 <option value="{{ $category->id }}"
                     {{ $product->category_id == $category->id ? 'selected' : '' }}>
-                    {{-- ↑ pre-selects the product's current category --}}
                     {{ $category->name }}
                 </option>
             @endforeach
         </select>
 
-          <!-- ✅ Image Upload - displays current MySQL or Cloudinary image -->
-    <label>Product Image</label>
+        <!-- ✅ Image Upload - Cloudinary -->
+        <label>Product Image</label>
 
-    @if($product->primaryImage)
-        {{-- NEW: Show image from MySQL --}}
-        <div style="margin-bottom: 10px;">
-            <p style="font-size: 13px; color: #555;">Current image (MySQL):</p>
-            <img id="current-preview"
-                 src="{{ route('product.image', $product->primaryImage->id) }}"
-                 alt="Current product image"
-                 style="width: 100%; max-height: 220px; object-fit: cover;
-                        border-radius: 8px; border: 1px solid #ddd;">
-        </div>
-    @elseif($product->image)
-        {{-- Fallback: Show existing Cloudinary image --}}
-        <div style="margin-bottom: 10px;">
-            <p style="font-size: 13px; color: #555;">Current image (Cloudinary):</p>
-            <img id="current-preview"
-                 src="{{ $product->image }}"
-                 alt="Current product image"
-                 style="width: 100%; max-height: 220px; object-fit: cover;
-                        border-radius: 8px; border: 1px solid #ddd;">
-        </div>
-    @endif
+        @if($product->image)
+            {{-- Show current Cloudinary image --}}
+            <div style="margin-bottom: 10px;">
+                <p style="font-size: 13px; color: #555;">Current image:</p>
+                <img id="current-preview"
+                     src="{{ $product->image }}"
+                     alt="Current product image"
+                     style="width: 100%; max-height: 220px; object-fit: cover;
+                            border-radius: 8px; border: 1px solid #ddd;">
+            </div>
+        @endif
 
-    <input type="file" name="image" id="image-input" accept="image/*">
+        <input type="file" name="image" id="image-input" accept="image/*">
 
-    <img id="new-preview" src="#" alt="New image preview"
-         style="display:none; width: 100%; max-height: 220px;
-                object-fit: cover; border-radius: 8px;
-                border: 2px dashed #007bff; margin-bottom: 15px;">
+        <img id="new-preview" src="#" alt="New image preview"
+             style="display:none; width: 100%; max-height: 220px;
+                    object-fit: cover; border-radius: 8px;
+                    border: 2px dashed #007bff; margin-bottom: 15px;">
 
 
         <button type="submit">Update Product</button>
@@ -157,4 +146,5 @@
 </script>
     <a href="/admin/logout" class="logout-btn">🚪 Logout</a>
 </div>
+
 
