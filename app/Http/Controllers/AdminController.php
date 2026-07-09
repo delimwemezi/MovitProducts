@@ -138,10 +138,11 @@ class AdminController extends Controller
                 $uploadedFile = Cloudinary::upload($request->file('image_file')->getRealPath(), [
                     'folder' => 'movit-products',
                     'resource_type' => 'auto',
-                ])->getSecurePath();
-                $imageUrl = $uploadedFile;
+                ]);
+                $imageUrl = $uploadedFile->getSecurePath();
             } catch (\Exception $e) {
                 \Log::error('Cloudinary upload failed: ' . $e->getMessage());
+                return redirect('/admin/products/create')->with('error', 'Image upload failed: ' . $e->getMessage());
             }
         } elseif ($request->input('image_url')) {
             // Use URL directly if provided
@@ -193,10 +194,11 @@ class AdminController extends Controller
                 $uploadedFile = Cloudinary::upload($request->file('image')->getRealPath(), [
                     'folder' => 'movit-products',
                     'resource_type' => 'auto',
-                ])->getSecurePath();
-                $data['image'] = $uploadedFile;
+                ]);
+                $data['image'] = $uploadedFile->getSecurePath();
             } catch (\Exception $e) {
                 \Log::error('Cloudinary upload failed: ' . $e->getMessage());
+                return redirect("/admin/products/edit/{$id}")->with('error', 'Image upload failed: ' . $e->getMessage());
             }
         }
 
