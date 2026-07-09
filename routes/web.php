@@ -25,6 +25,46 @@ Route::post('/place-order', [OrderController::class, 'store']);
 // ✅ NEW: Product image route - serve images from database
 Route::get('/product-image/{imageId}', [ProductImageController::class, 'show'])->name('product.image');
 
+// ============================
+// DIAGNOSTIC ROUTES (TEMPORARY)
+// ============================
+Route::get('/debug/products', function () {
+    $products = \App\Models\Product::with('primaryImage')->limit(10)->get();
+    return response()->json([
+        'total_products' => \App\Models\Product::count(),
+        'total_images' => \App\Models\ProductImage::count(),
+        'products' => $products->map(function ($p) {
+            return [
+                'id' => $p->id,
+                'name' => $p->name,
+                'has_primary_image' => $p->primaryImage ? true : false,
+                'image_id' => $p->primaryImage?->id,
+                'image_size' => $p->primaryImage?->file_size,
+                'mime_type' => $p->primaryImage?->mime_type,
+                'image_url' => $p->primaryImage ? route('product.image', $p->primaryImage->id) : null,
+            ];
+        }),
+    ]);
+});
+
+Route::get('/debug/images', function () {
+    $images = \App\Models\ProductImage::limit(10)->get();
+    return response()->json([
+        'total_images' => \App\Models\ProductImage::count(),
+        'images' => $images->map(function ($img) {
+            return [
+                'id' => $img->id,
+                'product_id' => $img->product_id,
+                'file_size' => $img->file_size,
+                'mime_type' => $img->mime_type,
+                'original_filename' => $img->original_filename,
+                'data_length' => strlen($img->image_data),
+                'is_cloudinary' => $img->is_cloudinary,
+            ];
+        }),
+    ]);
+});
+
 // ADMIN
 // ============================
 Route::get('/admin', function () { return redirect('/admin/login'); });
@@ -79,3 +119,4 @@ Route::get('/check-user', function () {
     $user = App\Models\User::where('email', 'delfinusideusdedith@gmail.com')->first();
     return $user;
 });
+
