@@ -128,18 +128,29 @@ class AdminController extends Controller
             'category_id'  => $request->category_id,
         ]);
 
-        // ✅ NEW: Store image in MySQL instead of Cloudinary
+        // ✅ Upload image to Cloudinary
         if ($request->hasFile('image_file')) {
             $file = $request->file('image_file');
-            
-            ProductImage::create([
-                'product_id'        => $product->id,
-                'image_data'        => file_get_contents($file->getRealPath()),
-                'mime_type'         => $file->getMimeType(),
-                'original_filename' => $file->getClientOriginalName(),
-                'file_size'         => $file->getSize(),
-                'is_cloudinary'     => false,
-            ]);
+
+            try {
+                $uploaded = \Cloudinary::uploadApi()->upload($file->getRealPath(), [
+                    'folder'    => 'products',
+                    'public_id' => Str::uuid(),
+                ]);
+
+                ProductImage::create([
+                    'product_id'        => $product->id,
+                    'image_url'         => $uploaded['secure_url'],
+                    'mime_type'         => $file->getMimeType(),
+                    'original_filename' => $file->getClientOriginalName(),
+                    'file_size'         => $file->getSize(),
+                    'is_cloudinary'     => true,
+                ]);
+            } catch (\Exception $e) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['image_file' => 'Image upload failed: ' . $e->getMessage()]);
+            }
         }
 
         return redirect('/admin/products')->with('success', 'Product saved successfully!');
@@ -176,18 +187,29 @@ class AdminController extends Controller
             'category_id'  => $request->category_id,
         ];
 
-        // ✅ NEW: Store new image in MySQL
+        // ✅ Upload new image to Cloudinary
         if ($request->hasFile('image')) {
             $file = $request->file('image');
-            
-            ProductImage::create([
-                'product_id'        => $product->id,
-                'image_data'        => file_get_contents($file->getRealPath()),
-                'mime_type'         => $file->getMimeType(),
-                'original_filename' => $file->getClientOriginalName(),
-                'file_size'         => $file->getSize(),
-                'is_cloudinary'     => false,
-            ]);
+
+            try {
+                $uploaded = \Cloudinary::uploadApi()->upload($file->getRealPath(), [
+                    'folder'    => 'products',
+                    'public_id' => Str::uuid(),
+                ]);
+
+                ProductImage::create([
+                    'product_id'        => $product->id,
+                    'image_url'         => $uploaded['secure_url'],
+                    'mime_type'         => $file->getMimeType(),
+                    'original_filename' => $file->getClientOriginalName(),
+                    'file_size'         => $file->getSize(),
+                    'is_cloudinary'     => true,
+                ]);
+            } catch (\Exception $e) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['image' => 'Image upload failed: ' . $e->getMessage()]);
+            }
         }
 
         $product->update($data);
