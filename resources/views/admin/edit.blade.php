@@ -22,6 +22,7 @@
             border-radius: 8px;
             margin-bottom: 15px;
             font-size: 14px;
+            box-sizing: border-box;
         }
         input:focus, textarea:focus, select:focus {
             outline: none;
@@ -40,6 +41,35 @@
         }
         button:hover { background: #0056b3; }
 
+        .image-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .image-section h4 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .current-image {
+            margin-bottom: 15px;
+        }
+
+        .current-image img {
+            max-width: 100%;
+            max-height: 220px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 15px 0;
+            color: #999;
+            font-size: 14px;
+        }
 
     .logout-btn {
         background: #ff4d4d;
@@ -50,17 +80,13 @@
         font-size: 14px;
         font-weight: bold;
         transition: 0.3s;
-        align-items: center;
-        gap: 6px;
+        display: inline-block;
+        margin-top: 10px;
     }
 
     .logout-btn:hover {
         background: #cc0000;
         transform: scale(1.05);
-    }
-
-    .logout-btn:active {
-        transform: scale(0.95);
     }
     </style>
 </head>
@@ -77,15 +103,11 @@
         <label>Product Name</label>
         <input type="text" name="name" value="{{ $product->name }}" required>
 
-        <div class="form-group">
-    <label for="carton_price">Carton Price</label>
-    <input type="number" name="carton_price" id="carton_price" placeholder="Carton Price" step="0.01" min="0" required value="{{ $product->carton_price }}">
-</div>
+        <label for="carton_price">Carton Price</label>
+        <input type="number" name="carton_price" id="carton_price" placeholder="Carton Price" step="0.01" min="0" required value="{{ $product->carton_price }}">
 
-<div class="form-group">
-    <label for="piece_price">Piece Price</label>
-    <input type="number" name="piece_price" id="piece_price" placeholder="Piece Price" step="0.01" min="0" required value="{{ $product->piece_price }}">
-</div>
+        <label for="piece_price">Piece Price</label>
+        <input type="number" name="piece_price" id="piece_price" placeholder="Piece Price" step="0.01" min="0" required value="{{ $product->piece_price }}">
 
         <label>Description</label>
         <textarea name="description">{{ $product->description }}</textarea>
@@ -101,49 +123,33 @@
             @endforeach
         </select>
 
-        <!-- ✅ Image Upload - Cloudinary -->
-        <label>Product Image</label>
+        <!-- ✅ Image Upload Section -->
+        <div class="image-section">
+            <h4>📸 Product Image</h4>
+            
+            @if($product->image)
+                <div class="current-image">
+                    <p style="font-size: 13px; color: #555; margin-bottom: 8px;">Current image:</p>
+                    <img src="{{ $product->image }}" alt="Current product image">
+                </div>
+            @endif
 
-        @if($product->image)
-            {{-- Show current Cloudinary image --}}
-            <div style="margin-bottom: 10px;">
-                <p style="font-size: 13px; color: #555;">Current image:</p>
-                <img id="current-preview"
-                     src="{{ $product->image }}"
-                     alt="Current product image"
-                     style="width: 100%; max-height: 220px; object-fit: cover;
-                            border-radius: 8px; border: 1px solid #ddd;">
+            <div class="form-group">
+                <label for="image_file"><strong>Upload New Image from Device</strong></label>
+                <input type="file" name="image_file" id="image_file" accept="image/*">
             </div>
-        @endif
 
-        <input type="file" name="image" id="image-input" accept="image/*">
+            <div class="divider">OR</div>
 
-        <img id="new-preview" src="#" alt="New image preview"
-             style="display:none; width: 100%; max-height: 220px;
-                    object-fit: cover; border-radius: 8px;
-                    border: 2px dashed #007bff; margin-bottom: 15px;">
-
+            <div class="form-group">
+                <label for="image_url"><strong>Use Image URL</strong></label>
+                <input type="url" name="image_url" id="image_url" placeholder="https://example.com/image.jpg">
+            </div>
+        </div>
 
         <button type="submit">Update Product</button>
     </form>
 
-    <script>
-    document.getElementById('image-input').addEventListener('change', function (e) {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function (evt) {
-            const newPreview = document.getElementById('new-preview');
-            newPreview.src = evt.target.result;
-            newPreview.style.display = 'block';
-
-            const current = document.getElementById('current-preview');
-            if (current) current.style.opacity = '0.4';
-        };
-        reader.readAsDataURL(file);
-    });
-</script>
     <a href="/admin/logout" class="logout-btn">🚪 Logout</a>
 </div>
 

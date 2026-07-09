@@ -103,6 +103,63 @@ class AdminController extends Controller
         return view('admin.create', compact('categories'));
     }
 
+    /**
+     * Upload image to Cloudinary using API
+     */
+    private function uploadToCloudinary($imageFile = null, $imageUrl = null)
+    {
+        $cloudName = env('CLOUDINARY_CLOUD_NAME');
+        $apiKey = env('CLOUDINARY_API_KEY');
+        $apiSecret = env('CLOUDINARY_API_SECRET');
+
+        if (!$cloudName || !$apiKey || !$apiSecret) {
+            throw new \Exception('Cloudinary credentials not configured');
+        }
+
+        $uploadUrl = "https://api.cloudinary.com/v1_1/{$cloudName}/image/upload";
+
+        // Prepare upload data
+        $postData = [
+            'api_key' => $apiKey,
+            'folder' => 'movit-products',
+            'resource_type' => 'auto',
+        ];
+
+        // Add file or URL
+        if ($imageFile) {
+            $postData['file'] = new \CURLFile($imageFile->getRealPath());
+        } elseif ($imageUrl) {
+            $postData['file'] = $imageUrl;
+        } else {
+            throw new \Exception('No image provided');
+        }
+
+        // Upload via cURL
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $uploadUrl);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode !== 200) {
+            \Log::error('Cloudinary upload failed', ['response' => $response, 'code' => $httpCode]);
+            throw new \Exception('Failed to upload image to Cloudinary');
+        }
+
+        $result = json_decode($response, true);
+        
+        if (!isset($result['secure_url'])) {
+            throw new \Exception('Invalid response from Cloudinary');
+        }
+
+        return $result['secure_url'];
+    }
+
     public function store(Request $request)
     {
         if ($redirect = $this->checkAuth()) return $redirect;
@@ -113,18 +170,34 @@ class AdminController extends Controller
             'piece_price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
+            'image_file'  => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120',
             'image_url'   => 'nullable|url',
         ]);
 
-        // ✅ Create product with Cloudinary URL
-        Product::create([
+        // Create the product
+        $product = Product::create([
             'name'         => $request->name,
             'carton_price' => $request->carton_price,
             'piece_price'  => $request->piece_price,
             'description'  => $request->description,
             'category_id'  => $request->category_id,
-            'image'        => $request->input('image_url'),
         ]);
+
+        // ✅ Upload image to Cloudinary
+        $imageUrl = null;
+        
+        if ($request->hasFile('image_file') || $request->input('image_url')) {
+            try {
+                $imageUrl = $this->uploadToCloudinary(
+                    $request->file('image_file'),
+                    $request->input('image_url')
+                );
+                $product->update(['image' => $imageUrl]);
+            } catch (\Exception $e) {
+                \Log::error('Image upload failed: ' . $e->getMessage());
+                return redirect('/admin/products/create')->with('error', 'Image upload failed: ' . $e->getMessage());
+            }
+        }
 
         return redirect('/admin/products')->with('success', 'Product saved successfully!');
     }
@@ -147,6 +220,7 @@ class AdminController extends Controller
             'piece_price'  => 'required|numeric|min:0',
             'description'  => 'nullable|string',
             'category_id'  => 'required|exists:categories,id',
+            'image_file'   => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120',
             'image_url'    => 'nullable|url',
         ]);
 
@@ -160,9 +234,18 @@ class AdminController extends Controller
             'category_id'  => $request->category_id,
         ];
 
-        // ✅ Update image URL if provided
-        if ($request->input('image_url')) {
-            $data['image'] = $request->input('image_url');
+        // ✅ Upload new image to Cloudinary if provided
+        if ($request->hasFile('image_file') || $request->input('image_url')) {
+            try {
+                $imageUrl = $this->uploadToCloudinary(
+                    $request->file('image_file'),
+                    $request->input('image_url')
+                );
+                $data['image'] = $imageUrl;
+            } catch (\Exception $e) {
+                \Log::error('Image upload failed: ' . $e->getMessage());
+                return redirect("/admin/products/edit/{$id}")->with('error', 'Image upload failed: ' . $e->getMessage());
+            }
         }
 
         $product->update($data);
