@@ -24,7 +24,7 @@ class ProductImageController extends Controller
 
         return response($imageData, 200, [
             'Content-Type'        => $image->mime_type,
-            'Content-Length'      => $image->file_size,
+            'Content-Length'      => strlen($imageData),
             'Cache-Control'       => 'public, max-age=604800', // Cache for 1 week
             'Content-Disposition' => 'inline; filename="' . $image->original_filename . '"',
         ]);
