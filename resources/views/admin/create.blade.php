@@ -5,7 +5,7 @@
     }
 
     .form-container {
-        width: 400px;
+        width: 450px;
         margin: 50px auto;
         background: #fff;
         padding: 25px;
@@ -59,7 +59,26 @@
         background: #0056b3;
     }
 
-       .logout-btn {
+    .image-section {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+    .image-section h4 {
+        margin-top: 0;
+        color: #333;
+    }
+
+    .divider {
+        text-align: center;
+        margin: 15px 0;
+        color: #999;
+        font-size: 14px;
+    }
+
+    .logout-btn {
         background: #ff4d4d;
         color: white;
         padding: 10px 20px;
@@ -68,17 +87,13 @@
         font-size: 14px;
         font-weight: bold;
         transition: 0.3s;
-        align-items: center;
-        gap: 6px;
+        display: inline-block;
+        margin-top: 10px;
     }
 
     .logout-btn:hover {
         background: #cc0000;
         transform: scale(1.05);
-    }
-
-    .logout-btn:active {
-        transform: scale(0.95);
     }
 </style>
 
@@ -92,15 +107,15 @@
             <input type="text" name="name" placeholder="Product Name" required>
         </div>
 
-      <div class="form-group">
-    <label for="carton_price">CartonPrice</label>
-    <input type="number" name="carton_price" id="carton_price" placeholder="CartonPrice" step="0.01" min="0" required>
-</div>
+        <div class="form-group">
+            <label for="carton_price">Carton Price</label>
+            <input type="number" name="carton_price" id="carton_price" placeholder="Carton Price" step="0.01" min="0" required>
+        </div>
 
-<div class="form-group">
-    <label for="piece_price">PiecePrice</label>
-    <input type="number" name="piece_price" id="piece_price" placeholder="PiecePrice" step="0.01" min="0" required>
-</div>
+        <div class="form-group">
+            <label for="piece_price">Piece Price</label>
+            <input type="number" name="piece_price" id="piece_price" placeholder="Piece Price" step="0.01" min="0" required>
+        </div>
 
         <div class="form-group">
             <textarea name="description" placeholder="Description"></textarea>
@@ -115,10 +130,21 @@
             </select>
         </div>
 
-        <!-- ✅ Simple file upload to Cloudinary -->
-        <div class="form-group">
-            <label for="image_file">Product Image</label>
-            <input type="file" name="image_file" id="image_file" accept="image/*">
+        <!-- ✅ Image Upload Section -->
+        <div class="image-section">
+            <h4>📸 Product Image</h4>
+            
+            <div class="form-group">
+                <label for="image_file"><strong>Upload from Device</strong></label>
+                <input type="file" name="image_file" id="image_file" accept="image/*">
+            </div>
+
+            <div class="divider">OR</div>
+
+            <div class="form-group">
+                <label for="image_url"><strong>Use Image URL</strong></label>
+                <input type="url" name="image_url" id="image_url" placeholder="https://example.com/image.jpg">
+            </div>
         </div>
 
         <button type="submit">Save Product</button>
