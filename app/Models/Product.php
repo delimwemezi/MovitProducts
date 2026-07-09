@@ -16,6 +16,11 @@ class Product extends Model
     ];
 
     /**
+     * Always eager-load the primary image to avoid N+1 queries
+     */
+    protected $with = ['primaryImage'];
+
+    /**
      * Relationship: Product belongs to a Category
      */
     public function category()
@@ -59,3 +64,4 @@ class Product extends Model
         return asset('images/no-image.png');
     }
 }
+

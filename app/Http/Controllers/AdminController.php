@@ -95,7 +95,7 @@ class AdminController extends Controller
     public function products()
     {
         if ($redirect = $this->checkAuth()) return $redirect;
-        $products = Product::all();
+        $products = Product::with('primaryImage')->get();  // ✅ Eager-load images
         return view('admin.products', compact('products'));
     }
 
@@ -148,7 +148,7 @@ class AdminController extends Controller
     public function edit(int $id)
     {
         if ($redirect = $this->checkAuth()) return $redirect;
-        $product    = Product::findOrFail($id);
+        $product    = Product::with('primaryImage')->findOrFail($id);  // ✅ Eager-load image
         $categories = Category::all();
         return view('admin.edit', compact('product', 'categories'));
     }
@@ -279,3 +279,4 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Admin removed!');
     }
 }
+
