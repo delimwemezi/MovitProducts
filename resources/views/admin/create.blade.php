@@ -22,6 +22,13 @@
         margin-bottom: 15px;
     }
 
+    label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+        font-size: 14px;
+    }
+
     input, textarea, select {
         width: 100%;
         padding: 10px;
@@ -59,23 +66,14 @@
         background: #0056b3;
     }
 
-    .image-section {
-        background: #f8f9fa;
-        padding: 15px;
-        border-radius: 8px;
+    .info-box {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 12px;
         margin-bottom: 15px;
-    }
-
-    .image-section h4 {
-        margin-top: 0;
-        color: #333;
-    }
-
-    .divider {
-        text-align: center;
-        margin: 15px 0;
-        color: #999;
-        font-size: 14px;
+        border-radius: 4px;
+        font-size: 13px;
+        color: #856404;
     }
 
     .logout-btn {
@@ -88,7 +86,7 @@
         font-weight: bold;
         transition: 0.3s;
         display: inline-block;
-        margin-top: 10px;
+        margin-top: 15px;
     }
 
     .logout-btn:hover {
@@ -100,28 +98,35 @@
 <div class="form-container">
     <h2>Add Product</h2>
 
-   <form method="POST" action="/admin/products/store" enctype="multipart/form-data">
+    <div class="info-box">
+        📸 <strong>Image URL:</strong> Paste your Cloudinary image URL here
+    </div>
+
+   <form method="POST" action="/admin/products/store">
         @csrf
 
         <div class="form-group">
-            <input type="text" name="name" placeholder="Product Name" required>
+            <label>Product Name *</label>
+            <input type="text" name="name" placeholder="e.g. Baby Gel" required>
         </div>
 
         <div class="form-group">
-            <label for="carton_price">Carton Price</label>
-            <input type="number" name="carton_price" id="carton_price" placeholder="Carton Price" step="0.01" min="0" required>
+            <label>Carton Price *</label>
+            <input type="number" name="carton_price" placeholder="0.00" step="0.01" min="0" required>
         </div>
 
         <div class="form-group">
-            <label for="piece_price">Piece Price</label>
-            <input type="number" name="piece_price" id="piece_price" placeholder="Piece Price" step="0.01" min="0" required>
+            <label>Piece Price *</label>
+            <input type="number" name="piece_price" placeholder="0.00" step="0.01" min="0" required>
         </div>
 
         <div class="form-group">
-            <textarea name="description" placeholder="Description"></textarea>
+            <label>Description</label>
+            <textarea name="description" placeholder="Product description..."></textarea>
         </div>
 
         <div class="form-group">
+            <label>Category *</label>
             <select name="category_id" required>
                 <option value="">-- Select Category --</option>
                 @foreach(\App\Models\Category::all() as $category)
@@ -130,21 +135,9 @@
             </select>
         </div>
 
-        <!-- ✅ Image Upload Section -->
-        <div class="image-section">
-            <h4>📸 Product Image</h4>
-            
-            <div class="form-group">
-                <label for="image_file"><strong>Upload from Device</strong></label>
-                <input type="file" name="image_file" id="image_file" accept="image/*">
-            </div>
-
-            <div class="divider">OR</div>
-
-            <div class="form-group">
-                <label for="image_url"><strong>Use Image URL</strong></label>
-                <input type="url" name="image_url" id="image_url" placeholder="https://example.com/image.jpg">
-            </div>
+        <div class="form-group">
+            <label>Image URL</label>
+            <input type="url" name="image" placeholder="https://res.cloudinary.com/ekgqdteo/image/upload/...">
         </div>
 
         <button type="submit">Save Product</button>
