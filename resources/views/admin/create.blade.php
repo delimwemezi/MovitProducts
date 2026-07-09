@@ -1,22 +1,3 @@
-<!---
-<h1>Add Product</h1>
-
-
-    @csrf
-
-    <input type="text" name="name" placeholder="Name"><br><br>
-
-    <input type="number" name="price" placeholder="Price"><br><br>
-
-    <textarea name="description" placeholder="Description"></textarea><br><br>
-
-     IMAGE INPUT -->   <!---
-    <input type="file" name="image"><br><br>
-
-    <button type="submit">Save</button>
-</form>
--->
-
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -24,7 +5,7 @@
     }
 
     .form-container {
-        width: 400px;
+        width: 450px;
         margin: 50px auto;
         background: #fff;
         padding: 25px;
@@ -41,6 +22,13 @@
         margin-bottom: 15px;
     }
 
+    label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+        font-size: 14px;
+    }
+
     input, textarea, select {
         width: 100%;
         padding: 10px;
@@ -49,6 +37,7 @@
         outline: none;
         font-size: 14px;
         transition: 0.3s;
+        box-sizing: border-box;
     }
 
     input:focus, textarea:focus, select:focus {
@@ -77,7 +66,17 @@
         background: #0056b3;
     }
 
-       .logout-btn {
+    .info-box {
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 4px;
+        font-size: 13px;
+        color: #856404;
+    }
+
+    .logout-btn {
         background: #ff4d4d;
         color: white;
         padding: 10px 20px;
@@ -86,45 +85,48 @@
         font-size: 14px;
         font-weight: bold;
         transition: 0.3s;
-        align-items: center;
-        gap: 6px;
+        display: inline-block;
+        margin-top: 15px;
     }
 
     .logout-btn:hover {
         background: #cc0000;
         transform: scale(1.05);
     }
-
-    .logout-btn:active {
-        transform: scale(0.95);
-    }
 </style>
 
 <div class="form-container">
     <h2>Add Product</h2>
 
-   <form method="POST" action="/admin/products/store" enctype="multipart/form-data">
+    <div class="info-box">
+        📸 <strong>Image URL:</strong> Paste your Cloudinary image URL here
+    </div>
+
+   <form method="POST" action="/admin/products/store">
         @csrf
 
         <div class="form-group">
-            <input type="text" name="name" placeholder="Product Name" required>
-        </div>
-
-      <div class="form-group">
-    <label for="carton_price">CartonPrice</label>
-    <input type="number" name="carton_price" id="carton_price" placeholder="CartonPrice" step="0.01" min="0" required>
-</div>
-
-<div class="form-group">
-    <label for="piece_price">PiecePrice</label>
-    <input type="number" name="piece_price" id="piece_price" placeholder="PiecePrice" step="0.01" min="0" required>
-</div>
-
-        <div class="form-group">
-            <textarea name="description" placeholder="Description"></textarea>
+            <label>Product Name *</label>
+            <input type="text" name="name" placeholder="e.g. Baby Gel" required>
         </div>
 
         <div class="form-group">
+            <label>Carton Price *</label>
+            <input type="number" name="carton_price" placeholder="0.00" step="0.01" min="0" required>
+        </div>
+
+        <div class="form-group">
+            <label>Piece Price *</label>
+            <input type="number" name="piece_price" placeholder="0.00" step="0.01" min="0" required>
+        </div>
+
+        <div class="form-group">
+            <label>Description</label>
+            <textarea name="description" placeholder="Product description..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Category *</label>
             <select name="category_id" required>
                 <option value="">-- Select Category --</option>
                 @foreach(\App\Models\Category::all() as $category)
@@ -133,22 +135,9 @@
             </select>
         </div>
 
-        <!-- IMAGE SOURCE TOGGLE -->
         <div class="form-group">
-            <select id="imageSource" onchange="toggleImageSource()">
-                <option value="device">Upload from Device</option>
-                <option value="url">Use Online URL</option>
-            </select>
-        </div>
-
-        <!-- UPLOAD FROM DEVICE -->
-        <div class="form-group" id="deviceUpload">
-            <input type="file" name="image_file" accept="image/*">
-        </div>
-
-        <!-- ONLINE URL -->
-        <div class="form-group" id="urlUpload" style="display:none;">
-            <input type="text" name="image_url" placeholder="https://example.com/image.jpg">
+            <label>Image URL</label>
+            <input type="url" name="image" placeholder="https://res.cloudinary.com/ekgqdteo/image/upload/...">
         </div>
 
         <button type="submit">Save Product</button>
@@ -156,10 +145,3 @@
     <a href="/admin/logout" class="logout-btn">🚪 Logout</a>
 </div>
 
-<script>
-function toggleImageSource() {
-    const source = document.getElementById('imageSource').value;
-    document.getElementById('deviceUpload').style.display = source === 'device' ? 'block' : 'none';
-    document.getElementById('urlUpload').style.display = source === 'url' ? 'block' : 'none';
-}
-</script>

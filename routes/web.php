@@ -22,9 +22,6 @@ Route::get('/cart', function () { return view('cart'); });
 Route::get('/checkout', function () { return view('checkout'); });
 Route::post('/place-order', [OrderController::class, 'store']);
 
-// ✅ NEW: Product image route - serve images from database
-Route::get('/product-image/{imageId}', [ProductImageController::class, 'show'])->name('product.image');
-
 // ADMIN
 // ============================
 Route::get('/admin', function () { return redirect('/admin/login'); });
@@ -43,7 +40,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::put('/products/update/{id}', [AdminController::class, 'update']);
     Route::get('/products/delete/{id}', [AdminController::class, 'delete']);
 
-    // Categories  ← removed wrong /admin prefix
+    // Categories
     Route::get('/categories', [CategoryController::class, 'index']);
     Route::post('/categories', [CategoryController::class, 'store']);
     Route::delete('/categories/{id}', [CategoryController::class, 'destroy']);
@@ -79,3 +76,4 @@ Route::get('/check-user', function () {
     $user = App\Models\User::where('email', 'delfinusideusdedith@gmail.com')->first();
     return $user;
 });
+

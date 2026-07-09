@@ -30,7 +30,11 @@ class ProductImage extends Model
      */
     public function getDataUrlAttribute(): string
     {
-        $base64 = base64_encode($this->image_data);
+        $imageData = $this->image_data;
+        if (is_resource($imageData)) {
+            $imageData = stream_get_contents($imageData);
+        }
+        $base64 = base64_encode($imageData);
         return "data:{$this->mime_type};base64,{$base64}";
     }
 }

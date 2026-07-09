@@ -4,20 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Http;
 use App\Models\Product;
-use App\Models\ProductImage;
 use App\Models\Order;
 use App\Models\Category;
 use App\Models\User;
 
 class AdminController extends Controller
 {
-    // =========================
-    // 🔐 AUTH CHECK
-    // =========================
-
     private function checkAuth()
     {
         if (!Auth::check() || !Auth::user()->is_admin) {
@@ -26,7 +19,6 @@ class AdminController extends Controller
         }
 
         $timeout = 15 * 60;
-
         if (session('last_activity') && (time() - session('last_activity') > $timeout)) {
             Auth::logout();
             session()->invalidate();
@@ -37,10 +29,6 @@ class AdminController extends Controller
         session(['last_activity' => time()]);
         return null;
     }
-
-    // =========================
-    // 🔐 LOGIN SECTION
-    // =========================
 
     public function showLogin()
     {
@@ -53,20 +41,16 @@ class AdminController extends Controller
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
-
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
-
             if ($user->is_admin) {
                 session(['last_activity' => time()]);
                 $request->session()->regenerate();
                 return redirect('/admin/dashboard');
             }
-
             Auth::logout();
             return back()->with('error', 'You are not an admin.');
         }
-
         return back()->with('error', 'Invalid credentials');
     }
 
@@ -78,19 +62,11 @@ class AdminController extends Controller
         return redirect('/admin/login');
     }
 
-    // =========================
-    // 📊 DASHBOARD
-    // =========================
-
     public function dashboard()
     {
         if ($redirect = $this->checkAuth()) return $redirect;
         return view('admin.dashboard');
     }
-
-    // =========================
-    // 📦 PRODUCTS SECTION
-    // =========================
 
     public function products()
     {
@@ -116,31 +92,17 @@ class AdminController extends Controller
             'piece_price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
-            'image_file'  => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'image'       => 'nullable|url',
         ]);
 
-        // Create the product
-        $product = Product::create([
+        Product::create([
             'name'         => $request->name,
             'carton_price' => $request->carton_price,
             'piece_price'  => $request->piece_price,
             'description'  => $request->description,
             'category_id'  => $request->category_id,
+            'image'        => $request->input('image'),
         ]);
-
-        // ✅ NEW: Store image in MySQL instead of Cloudinary
-        if ($request->hasFile('image_file')) {
-            $file = $request->file('image_file');
-            
-            ProductImage::create([
-                'product_id'        => $product->id,
-                'image_data'        => file_get_contents($file->getRealPath()),
-                'mime_type'         => $file->getMimeType(),
-                'original_filename' => $file->getClientOriginalName(),
-                'file_size'         => $file->getSize(),
-                'is_cloudinary'     => false,
-            ]);
-        }
 
         return redirect('/admin/products')->with('success', 'Product saved successfully!');
     }
@@ -163,11 +125,10 @@ class AdminController extends Controller
             'piece_price'  => 'required|numeric|min:0',
             'description'  => 'nullable|string',
             'category_id'  => 'required|exists:categories,id',
-            'image'        => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'image'        => 'nullable|url',
         ]);
 
         $product = Product::findOrFail($id);
-
         $data = [
             'name'         => $request->name,
             'carton_price' => $request->carton_price,
@@ -176,40 +137,21 @@ class AdminController extends Controller
             'category_id'  => $request->category_id,
         ];
 
-        // ✅ NEW: Store new image in MySQL
-        if ($request->hasFile('image')) {
-            $file = $request->file('image');
-            
-            ProductImage::create([
-                'product_id'        => $product->id,
-                'image_data'        => file_get_contents($file->getRealPath()),
-                'mime_type'         => $file->getMimeType(),
-                'original_filename' => $file->getClientOriginalName(),
-                'file_size'         => $file->getSize(),
-                'is_cloudinary'     => false,
-            ]);
+        if ($request->input('image')) {
+            $data['image'] = $request->input('image');
         }
 
         $product->update($data);
-
         return redirect('/admin/products')->with('success', 'Product Updated');
     }
 
     public function delete(int $id)
     {
         if ($redirect = $this->checkAuth()) return $redirect;
-
         $product = Product::findOrFail($id);
-
-        // ✅ Delete will cascade via foreign key - product_images will be auto-deleted
         $product->delete();
-
         return redirect('/admin/products')->with('success', 'Product Deleted');
     }
-
-    // =========================
-    // 📋 ORDERS SECTION
-    // =========================
 
     public function orders()
     {
@@ -221,7 +163,7 @@ class AdminController extends Controller
     public function updateOrderStatus(Request $request, int $id)
     {
         if ($redirect = $this->checkAuth()) return $redirect;
-        $order         = Order::findOrFail($id);
+        $order = Order::findOrFail($id);
         $order->status = $request->status;
         $order->save();
         return back()->with('success', 'Order status updated');
@@ -230,15 +172,11 @@ class AdminController extends Controller
     public function cancelOrder(int $id)
     {
         if ($redirect = $this->checkAuth()) return $redirect;
-        $order         = Order::findOrFail($id);
+        $order = Order::findOrFail($id);
         $order->status = 'cancelled';
         $order->save();
         return back()->with('success', 'Order cancelled');
     }
-
-    // =========================
-    // 👤 ADMINS SECTION
-    // =========================
 
     public function admins()
     {
@@ -279,3 +217,4 @@ class AdminController extends Controller
         return redirect()->back()->with('success', 'Admin removed!');
     }
 }
+
