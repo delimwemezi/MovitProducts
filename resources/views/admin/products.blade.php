@@ -141,11 +141,8 @@
 
     <!-- IMAGE -->
     <td>
-        @if($product->primaryImage)
-            {{-- ✅ NEW: Display image from MySQL --}}
-            <img src="{{ route('product.image', $product->primaryImage->id) }}" width="70" height="70" style="object-fit:cover;">
-        @elseif($product->image)
-            {{-- Fallback to Cloudinary URL for existing products --}}
+        @if($product->image)
+            {{-- ✅ Display Cloudinary image --}}
             <img src="{{ $product->image }}" width="70" height="70" style="object-fit:cover;">
         @else
             <span class="badge">No Image</span>
@@ -175,3 +172,4 @@
 <a href="/admin/logout" class="logout-btn">🚪 Logout</a>
 </body>
 </html>
+

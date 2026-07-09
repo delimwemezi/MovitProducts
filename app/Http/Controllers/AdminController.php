@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\Order;
@@ -95,7 +96,7 @@ class AdminController extends Controller
     public function products()
     {
         if ($redirect = $this->checkAuth()) return $redirect;
-        $products = Product::with('primaryImage')->get();  // ✅ Eager-load images
+        $products = Product::all();
         return view('admin.products', compact('products'));
     }
 
@@ -104,46 +105,6 @@ class AdminController extends Controller
         if ($redirect = $this->checkAuth()) return $redirect;
         $categories = Category::all();
         return view('admin.create', compact('categories'));
-    }
-
-    /**
-     * Helper: Save image from file or URL to database
-     */
-    private function saveProductImage($product, $imageFile = null, $imageUrl = null)
-    {
-        // Priority: file upload > URL
-        if ($imageFile) {
-            ProductImage::create([
-                'product_id'        => $product->id,
-                'image_data'        => file_get_contents($imageFile->getRealPath()),
-                'mime_type'         => $imageFile->getMimeType(),
-                'original_filename' => $imageFile->getClientOriginalName(),
-                'file_size'         => $imageFile->getSize(),
-                'is_cloudinary'     => false,
-            ]);
-        } elseif ($imageUrl) {
-            try {
-                // Download image from URL
-                $response = Http::get($imageUrl);
-                if ($response->successful()) {
-                    $imageData = $response->body();
-                    $mimeType = $response->header('Content-Type') ?? 'image/jpeg';
-                    $filename = basename(parse_url($imageUrl, PHP_URL_PATH)) ?: 'image.jpg';
-                    
-                    ProductImage::create([
-                        'product_id'        => $product->id,
-                        'image_data'        => $imageData,
-                        'mime_type'         => $mimeType,
-                        'original_filename' => $filename,
-                        'file_size'         => strlen($imageData),
-                        'is_cloudinary'     => false,
-                    ]);
-                }
-            } catch (\Exception $e) {
-                // Silently fail - image URL might be invalid
-                \Log::warning("Failed to download image from URL: {$imageUrl}", ['error' => $e->getMessage()]);
-            }
-        }
     }
 
     public function store(Request $request)
@@ -156,7 +117,7 @@ class AdminController extends Controller
             'piece_price' => 'required|numeric|min:0',
             'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
-            'image_file'  => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'image_file'  => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120',
             'image_url'   => 'nullable|url',
         ]);
 
@@ -167,15 +128,30 @@ class AdminController extends Controller
             'piece_price'  => $request->piece_price,
             'description'  => $request->description,
             'category_id'  => $request->category_id,
-            'image'        => $request->image_url,
         ]);
 
-        // ✅ Save image from file OR URL
-        $this->saveProductImage(
-            $product,
-            $request->file('image_file'),
-            $request->input('image_url')
-        );
+        // ✅ Upload image to Cloudinary
+        $imageUrl = null;
+        
+        if ($request->hasFile('image_file')) {
+            try {
+                $uploadedFile = Cloudinary::upload($request->file('image_file')->getRealPath(), [
+                    'folder' => 'movit-products',
+                    'resource_type' => 'auto',
+                ])->getSecurePath();
+                $imageUrl = $uploadedFile;
+            } catch (\Exception $e) {
+                \Log::error('Cloudinary upload failed: ' . $e->getMessage());
+            }
+        } elseif ($request->input('image_url')) {
+            // Use URL directly if provided
+            $imageUrl = $request->input('image_url');
+        }
+
+        // Save image URL to product
+        if ($imageUrl) {
+            $product->update(['image' => $imageUrl]);
+        }
 
         return redirect('/admin/products')->with('success', 'Product saved successfully!');
     }
@@ -183,7 +159,7 @@ class AdminController extends Controller
     public function edit(int $id)
     {
         if ($redirect = $this->checkAuth()) return $redirect;
-        $product    = Product::with('primaryImage')->findOrFail($id);  // ✅ Eager-load image
+        $product    = Product::findOrFail($id);
         $categories = Category::all();
         return view('admin.edit', compact('product', 'categories'));
     }
@@ -198,7 +174,7 @@ class AdminController extends Controller
             'piece_price'  => 'required|numeric|min:0',
             'description'  => 'nullable|string',
             'category_id'  => 'required|exists:categories,id',
-            'image'        => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'image'        => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120',
         ]);
 
         $product = Product::findOrFail($id);
@@ -211,9 +187,17 @@ class AdminController extends Controller
             'category_id'  => $request->category_id,
         ];
 
-        // ✅ Store new image in MySQL if provided
+        // ✅ Upload new image to Cloudinary if provided
         if ($request->hasFile('image')) {
-            $this->saveProductImage($product, $request->file('image'));
+            try {
+                $uploadedFile = Cloudinary::upload($request->file('image')->getRealPath(), [
+                    'folder' => 'movit-products',
+                    'resource_type' => 'auto',
+                ])->getSecurePath();
+                $data['image'] = $uploadedFile;
+            } catch (\Exception $e) {
+                \Log::error('Cloudinary upload failed: ' . $e->getMessage());
+            }
         }
 
         $product->update($data);
@@ -226,8 +210,6 @@ class AdminController extends Controller
         if ($redirect = $this->checkAuth()) return $redirect;
 
         $product = Product::findOrFail($id);
-
-        // ✅ Delete will cascade via foreign key - product_images will be auto-deleted
         $product->delete();
 
         return redirect('/admin/products')->with('success', 'Product Deleted');
