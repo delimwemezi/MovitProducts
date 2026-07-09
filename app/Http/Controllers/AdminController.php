@@ -117,6 +117,7 @@ class AdminController extends Controller
             'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
             'image_file'  => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'image_url'   => 'nullable|url',
         ]);
 
         // Create the product
@@ -126,6 +127,7 @@ class AdminController extends Controller
             'piece_price'  => $request->piece_price,
             'description'  => $request->description,
             'category_id'  => $request->category_id,
+            'image'        => $request->image_url,
         ]);
 
         // ✅ NEW: Store image in MySQL instead of Cloudinary
