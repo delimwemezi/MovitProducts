@@ -107,41 +107,60 @@ class AdminController extends Controller
     }
 
     /**
-     * Helper: Save image from file or URL to database
+     * Helper: Upload image from file or URL to Cloudinary and return URL
      */
-    private function saveProductImage($product, $imageFile = null, $imageUrl = null)
+    private function uploadToCloudinary($imageFile = null, $imageUrl = null)
     {
-        // Priority: file upload > URL
         if ($imageFile) {
-            ProductImage::create([
-                'product_id'        => $product->id,
-                'image_data'        => file_get_contents($imageFile->getRealPath()),
-                'mime_type'         => $imageFile->getMimeType(),
-                'original_filename' => $imageFile->getClientOriginalName(),
-                'file_size'         => $imageFile->getSize(),
-                'is_cloudinary'     => false,
-            ]);
+            try {
+                $uploaded = cloudinary()->uploadApi()->upload(
+                    $imageFile->getRealPath(),
+                    ['folder' => 'products']
+                );
+                return $uploaded['secure_url'];
+            } catch (\Exception $e) {
+                \Log::error("Cloudinary file upload failed: " . $e->getMessage());
+                throw $e;
+            }
         } elseif ($imageUrl) {
             try {
-                // Download image from URL
-                $response = Http::get($imageUrl);
-                if ($response->successful()) {
-                    $imageData = $response->body();
-                    $mimeType = $response->header('Content-Type') ?? 'image/jpeg';
-                    $filename = basename(parse_url($imageUrl, PHP_URL_PATH)) ?: 'image.jpg';
-                    
-                    ProductImage::create([
-                        'product_id'        => $product->id,
-                        'image_data'        => $imageData,
-                        'mime_type'         => $mimeType,
-                        'original_filename' => $filename,
-                        'file_size'         => strlen($imageData),
-                        'is_cloudinary'     => false,
-                    ]);
+                // Validate URL first
+                $parsed = parse_url($imageUrl);
+                if (!isset($parsed['scheme']) || !in_array(strtolower($parsed['scheme']), ['http', 'https'])) {
+                    throw new \InvalidArgumentException('Only http and https URLs are allowed.');
                 }
+                $host = strtolower($parsed['host'] ?? '');
+                if (in_array($host, ['localhost', '127.0.0.1', '::1'])) {
+                    throw new \InvalidArgumentException('This URL is not allowed.');
+                }
+
+                $uploaded = cloudinary()->uploadApi()->upload($imageUrl, ['folder' => 'products']);
+                return $uploaded['secure_url'];
             } catch (\Exception $e) {
-                // Silently fail - image URL might be invalid
-                \Log::warning("Failed to download image from URL: {$imageUrl}", ['error' => $e->getMessage()]);
+                \Log::error("Cloudinary URL upload failed: " . $e->getMessage());
+                throw $e;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Helper: Delete image from Cloudinary if it is a Cloudinary URL
+     */
+    private function deleteCloudinaryImage($imageUrl)
+    {
+        if ($imageUrl && str_contains($imageUrl, 'cloudinary.com')) {
+            try {
+                $path        = parse_url($imageUrl, PHP_URL_PATH);
+                $path        = preg_replace('/\/v\d+\//', '/', $path);
+                $parts       = explode('/upload/', $path);
+                $publicId    = pathinfo($parts[1] ?? '', PATHINFO_FILENAME);
+                $folder      = dirname($parts[1] ?? '');
+                $fullPublicId = trim($folder . '/' . $publicId, '/');
+
+                cloudinary()->uploadApi()->destroy($fullPublicId);
+            } catch (\Exception $e) {
+                \Log::warning("Failed to delete Cloudinary image: {$imageUrl}", ['error' => $e->getMessage()]);
             }
         }
     }
@@ -160,22 +179,27 @@ class AdminController extends Controller
             'image_url'   => 'nullable|url',
         ]);
 
+        $imagePath = null;
+        if ($request->hasFile('image_file') || $request->filled('image_url')) {
+            try {
+                $imagePath = $this->uploadToCloudinary(
+                    $request->file('image_file'),
+                    $request->input('image_url')
+                );
+            } catch (\Exception $e) {
+                return back()->withInput()->withErrors(['image_file' => 'Failed to upload image to Cloudinary: ' . $e->getMessage()]);
+            }
+        }
+
         // Create the product
-        $product = Product::create([
+        Product::create([
             'name'         => $request->name,
             'carton_price' => $request->carton_price,
             'piece_price'  => $request->piece_price,
             'description'  => $request->description,
             'category_id'  => $request->category_id,
-            'image'        => $request->image_url,
+            'image'        => $imagePath,
         ]);
-
-        // ✅ Save image from file OR URL
-        $this->saveProductImage(
-            $product,
-            $request->file('image_file'),
-            $request->input('image_url')
-        );
 
         return redirect('/admin/products')->with('success', 'Product saved successfully!');
     }
@@ -211,9 +235,20 @@ class AdminController extends Controller
             'category_id'  => $request->category_id,
         ];
 
-        // ✅ Store new image in MySQL if provided
+        // ✅ Store new image in Cloudinary if provided
         if ($request->hasFile('image')) {
-            $this->saveProductImage($product, $request->file('image'));
+            try {
+                // Delete old Cloudinary image if it exists
+                $this->deleteCloudinaryImage($product->image);
+                
+                // Upload new Cloudinary image
+                $data['image'] = $this->uploadToCloudinary($request->file('image'));
+
+                // Delete any MySQL-stored images to ensure the new Cloudinary image displays
+                $product->productImages()->delete();
+            } catch (\Exception $e) {
+                return back()->withErrors(['image' => 'Failed to upload image to Cloudinary: ' . $e->getMessage()]);
+            }
         }
 
         $product->update($data);
@@ -226,6 +261,9 @@ class AdminController extends Controller
         if ($redirect = $this->checkAuth()) return $redirect;
 
         $product = Product::findOrFail($id);
+
+        // ✅ Delete image from Cloudinary if it exists
+        $this->deleteCloudinaryImage($product->image);
 
         // ✅ Delete will cascade via foreign key - product_images will be auto-deleted
         $product->delete();
