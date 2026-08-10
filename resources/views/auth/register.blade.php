@@ -37,7 +37,7 @@
             <button type="submit" class="primary-btn">Create account</button>
         </form>
 
-        <p class="auth-link">Already have an account? <a href="{{ route('login') }}">Sign in</a></p>
+        <p class="auth-link">Already have an account? <a href="{{ route('customer.login') }}">Sign in</a></p>
     </div>
 </div>
 

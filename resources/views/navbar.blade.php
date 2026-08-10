@@ -10,12 +10,12 @@
         <a href="{{ route('product-lists.create') }}">Product List</a>
         @auth
             <a href="{{ route('product-lists.history') }}">My Lists</a>
-            <form method="POST" action="{{ route('logout') }}" style="display:inline; margin:0;">
+            <form method="POST" action="{{ route('customer.logout') }}" style="display:inline; margin:0;">
                 @csrf
                 <button type="submit" class="nav-logout-btn">Logout</button>
             </form>
         @else
-            <a href="{{ route('login') }}">Login</a>
+            <a href="{{ route('customer.login') }}">Login</a>
             <a href="{{ route('register') }}">Register</a>
         @endauth
     </div>

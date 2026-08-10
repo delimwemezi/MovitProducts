@@ -49,7 +49,7 @@ Route::post('/register', function (\Illuminate\Http\Request $request) {
 });
 Route::get('/login', function () {
     return view('auth.login');
-})->name('login');
+})->name('customer.login');
 Route::post('/login', function (\Illuminate\Http\Request $request) {
     $credentials = $request->only('email', 'password');
 
@@ -66,7 +66,7 @@ Route::post('/logout', function (\Illuminate\Http\Request $request) {
     $request->session()->regenerateToken();
 
     return redirect('/')->with('success', 'You have been logged out.');
-})->name('logout');
+})->name('customer.logout');
 
 // ✅ NEW: Product image route - serve images from database
 Route::get('/product-image/{imageId}', [ProductImageController::class, 'show'])->name('product.image');
@@ -76,7 +76,7 @@ Route::get('/product-image/{imageId}', [ProductImageController::class, 'show'])-
 Route::get('/admin', function () { return redirect('/admin/login'); });
 Route::get('/admin/login', [AdminController::class, 'showLogin'])->name('admin.login');
 Route::post('/admin/login', [AdminController::class, 'login']);
-Route::get('/admin/logout', [AdminController::class, 'logout'])->name('logout');
+Route::get('/admin/logout', [AdminController::class, 'logout'])->name('admin.logout');
 
 Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard']);
