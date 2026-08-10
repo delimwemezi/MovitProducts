@@ -73,8 +73,8 @@
 
     <div class="list-notice" id="listNotice" aria-live="polite" hidden>
         <div class="notice-actions">
-            <button type="button" class="view-list-btn" id="viewListBtn" aria-label="View list">
-                <span class="view-list-icon" aria-hidden="true">☰</span>
+            <button type="button" class="view-list-btn" id="viewListBtn" aria-label="viewlist">
+                <span class="view-list-text">viewlist</span>
             </button>
             <button type="button" class="dismiss-list-btn" id="dismissListBtn" aria-label="Dismiss list notice">×</button>
         </div>
@@ -186,19 +186,22 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 42px;
-        height: 42px;
-        padding: 0;
+        min-width: 64px;
+        height: 38px;
+        padding: 0 10px;
         background: linear-gradient(135deg, #7c3aed, #ec4899);
         color: #fff;
         border: none;
-        border-radius: 12px;
+        border-radius: 10px;
         cursor: pointer;
         box-shadow: 0 10px 22px rgba(124, 58, 237, 0.25);
     }
-    .view-list-icon {
-        font-size: 1.25rem;
+    .view-list-text {
+        font-size: 0.72rem;
+        font-weight: 800;
         line-height: 1;
+        letter-spacing: 0.02em;
+        text-transform: lowercase;
     }
     .dismiss-list-btn {
         width: 28px;
