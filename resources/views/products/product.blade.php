@@ -73,12 +73,14 @@
 
     <div class="list-notice" id="listNotice" aria-live="polite" hidden>
         <div class="notice-actions">
-            <button type="button" class="view-list-btn" id="viewListBtn">View</button>
+            <button type="button" class="view-list-btn" id="viewListBtn" aria-label="View list">
+                <span class="view-list-icon" aria-hidden="true">☰</span>
+            </button>
             <button type="button" class="dismiss-list-btn" id="dismissListBtn" aria-label="Dismiss list notice">×</button>
         </div>
     </div>
 
-    <form action="{{ route('product-lists.store') }}" method="POST" class="product-list-confirmation" id="productListForm">
+    <form action="{{ route('product-lists.store') }}" method="POST" class="product-list-confirmation" id="productListForm" hidden>
         @csrf
         <div class="list-summary-card" id="listSummaryCard">
             <div class="summary-header">
@@ -181,14 +183,22 @@
         padding: 0;
     }
     .view-list-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        padding: 0;
         background: linear-gradient(135deg, #7c3aed, #ec4899);
         color: #fff;
         border: none;
-        border-radius: 10px;
-        padding: 10px 16px;
-        font-weight: 700;
+        border-radius: 12px;
         cursor: pointer;
         box-shadow: 0 10px 22px rgba(124, 58, 237, 0.25);
+    }
+    .view-list-icon {
+        font-size: 1.25rem;
+        line-height: 1;
     }
     .dismiss-list-btn {
         width: 28px;
@@ -516,6 +526,9 @@
 
     if (viewListBtn) {
         viewListBtn.addEventListener('click', function () {
+            if (listForm) {
+                listForm.hidden = false;
+            }
             scrollToList();
             listNotice.hidden = false;
         });
@@ -524,6 +537,9 @@
     if (dismissListBtn) {
         dismissListBtn.addEventListener('click', function () {
             toggleNotice(false);
+            if (listForm) {
+                listForm.hidden = true;
+            }
         });
     }
 
