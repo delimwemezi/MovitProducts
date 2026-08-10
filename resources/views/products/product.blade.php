@@ -223,11 +223,11 @@
         margin: 28px 0 50px;
     }
     .list-summary-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 20px;
-        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05);
-        padding: 22px;
+        background: linear-gradient(180deg, #ffffff 0%, #fdf2f8 100%);
+        border: 1px solid #f3d8ea;
+        border-radius: 24px;
+        box-shadow: 0 18px 45px rgba(124, 58, 237, 0.12);
+        padding: 24px;
     }
     .summary-header {
         display: flex;
@@ -235,6 +235,20 @@
         align-items: center;
         gap: 12px;
         margin-bottom: 18px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #f1d8ea;
+    }
+    .summary-header h3 {
+        margin: 4px 0 0;
+        color: #2f1748;
+    }
+    .eyebrow {
+        margin: 0;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-size: 0.72rem;
+        color: #8b5cf6;
+        font-weight: 800;
     }
     .summary-actions {
         display: flex;
@@ -270,41 +284,44 @@
     }
     .selected-product-item {
         display: grid;
-        grid-template-columns: 1.4fr 1fr 1fr auto;
+        grid-template-columns: 1.6fr 1fr 1fr auto;
         gap: 12px;
         align-items: end;
-        padding: 12px 14px;
-        background: #f9fafb;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
+        padding: 14px 16px;
+        background: #fff;
+        border: 1px solid #f3d8ea;
+        border-radius: 14px;
+        box-shadow: 0 8px 18px rgba(124, 58, 237, 0.05);
+    }
+    .selected-product-meta {
+        min-width: 0;
     }
     .selected-product-item h4 {
-        margin: 0 0 6px;
+        margin: 0;
         color: #111827;
         font-size: 0.98rem;
-    }
-    .selected-product-item small {
-        color: #6b7280;
+        line-height: 1.4;
     }
     .qty-field label {
         display: flex;
         flex-direction: column;
         gap: 6px;
-        font-weight: 600;
-        color: #374151;
-        font-size: 0.8rem;
+        font-weight: 700;
+        color: #4b5563;
+        font-size: 0.76rem;
     }
     .qty-field input {
         width: 100%;
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        padding: 9px 10px;
+        border: 1px solid #e5d5f7;
+        border-radius: 10px;
+        padding: 10px 12px;
+        background: #faf5ff;
     }
     .remove-product-btn {
-        background: transparent;
-        border: 1px solid #fecaca;
-        color: #b91c1c;
-        border-radius: 8px;
+        background: linear-gradient(135deg, #fff1f2, #ffe4e6);
+        border: 1px solid #fda4af;
+        color: #be123c;
+        border-radius: 10px;
         padding: 10px 12px;
         cursor: pointer;
         font-weight: 700;
@@ -435,9 +452,8 @@
             const row = document.createElement('div');
             row.className = 'selected-product-item';
             row.innerHTML = `
-                <div>
+                <div class="selected-product-meta">
                     <h4>${item.name}</h4>
-                    <small>TSh ${Number(item.carton_price || 0).toLocaleString()} / carton</small>
                 </div>
                 <div class="qty-field">
                     <label>Cartons
