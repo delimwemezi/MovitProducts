@@ -17,4 +17,12 @@ class ProductListCreatePageTest extends TestCase
         $response->assertSee('Email address');
         $response->assertSee('Confirm and send list');
     }
+
+    public function test_product_page_shows_cancel_option_for_selection_list(): void
+    {
+        $response = $this->get('/products');
+
+        $response->assertOk();
+        $response->assertSee('Cancel list');
+    }
 }

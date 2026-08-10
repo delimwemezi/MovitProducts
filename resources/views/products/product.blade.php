@@ -72,11 +72,14 @@
     </div>
 
     <div class="list-notice" id="listNotice" aria-live="polite" hidden>
-        <div>
+        <div class="notice-content">
             <strong>Product added to your list.</strong>
             <p>Review your selection and confirm before sending.</p>
         </div>
-        <button type="button" class="view-list-btn" id="viewListBtn">View list</button>
+        <div class="notice-actions">
+            <button type="button" class="view-list-btn" id="viewListBtn">View list</button>
+            <button type="button" class="dismiss-list-btn" id="dismissListBtn" aria-label="Dismiss list notice">×</button>
+        </div>
     </div>
 
     <form action="{{ route('product-lists.store') }}" method="POST" class="product-list-confirmation" id="productListForm">
@@ -87,7 +90,10 @@
                     <p class="eyebrow">Your selection</p>
                     <h3>Shopping list preview</h3>
                 </div>
-                <span class="selection-count" id="selectionCount">0 items</span>
+                <div class="summary-actions">
+                    <span class="selection-count" id="selectionCount">0 items</span>
+                    <button type="button" class="cancel-list-btn" id="cancelListBtn">Cancel list</button>
+                </div>
             </div>
 
             <div id="selectedProductsContainer" class="selected-products-container">
@@ -162,16 +168,31 @@
         display: inline-block;
     }
     .list-notice {
+        position: fixed;
+        right: 22px;
+        bottom: 22px;
+        z-index: 1000;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 16px;
-        margin: 0 0 22px;
+        gap: 14px;
+        width: min(360px, calc(100vw - 28px));
+        margin: 0;
         padding: 16px 18px;
         border-radius: 16px;
         border: 1px solid #dcfce7;
         background: linear-gradient(135deg, #f0fdf4, #ecfeff);
-        box-shadow: 0 12px 24px rgba(34, 197, 94, 0.08);
+        box-shadow: 0 18px 38px rgba(34, 197, 94, 0.18);
+    }
+    .notice-content {
+        flex: 1;
+        min-width: 0;
+    }
+    .notice-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
     }
     .list-notice strong {
         display: block;
@@ -181,6 +202,7 @@
     .list-notice p {
         margin: 0;
         color: #166534;
+        line-height: 1.4;
     }
     .view-list-btn {
         background: linear-gradient(135deg, #7c3aed, #ec4899);
@@ -190,6 +212,21 @@
         padding: 11px 18px;
         font-weight: 700;
         cursor: pointer;
+    }
+    .dismiss-list-btn {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(22, 101, 52, 0.2);
+        background: rgba(255, 255, 255, 0.7);
+        color: #166534;
+        border-radius: 50%;
+        font-size: 1.5rem;
+        line-height: 1;
+        cursor: pointer;
+        padding: 0;
     }
     .product-list-confirmation {
         margin: 28px 0 50px;
@@ -208,6 +245,11 @@
         gap: 12px;
         margin-bottom: 18px;
     }
+    .summary-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
     .selection-count {
         background: #f3e8ff;
         color: #6d28d9;
@@ -215,6 +257,15 @@
         padding: 8px 12px;
         font-size: 0.8rem;
         font-weight: 700;
+    }
+    .cancel-list-btn {
+        border: 1px solid #fecaca;
+        background: #fff1f2;
+        color: #be123c;
+        border-radius: 10px;
+        padding: 8px 12px;
+        font-weight: 700;
+        cursor: pointer;
     }
     .selected-products-container {
         display: grid;
@@ -332,11 +383,38 @@
     const estimatedTotalEl = document.getElementById('estimatedTotal');
     const listNotice = document.getElementById('listNotice');
     const viewListBtn = document.getElementById('viewListBtn');
+    const dismissListBtn = document.getElementById('dismissListBtn');
+    const cancelListBtn = document.getElementById('cancelListBtn');
     const listForm = document.getElementById('productListForm');
+    let dismissTimer = null;
+
+    function clearDismissTimer() {
+        if (dismissTimer) {
+            clearTimeout(dismissTimer);
+            dismissTimer = null;
+        }
+    }
 
     function toggleNotice(show) {
         if (!listNotice) return;
         listNotice.hidden = !show;
+
+        if (show) {
+            clearDismissTimer();
+            dismissTimer = setTimeout(() => {
+                listNotice.hidden = true;
+            }, 180000);
+        } else {
+            clearDismissTimer();
+        }
+    }
+
+    function clearSelection() {
+        selectedProducts.clear();
+        refreshSelectionButtons();
+        updateSummary();
+        syncHiddenFields();
+        toggleNotice(false);
     }
 
     function scrollToList() {
@@ -461,6 +539,19 @@
     if (viewListBtn) {
         viewListBtn.addEventListener('click', function () {
             scrollToList();
+            listNotice.hidden = false;
+        });
+    }
+
+    if (dismissListBtn) {
+        dismissListBtn.addEventListener('click', function () {
+            toggleNotice(false);
+        });
+    }
+
+    if (cancelListBtn) {
+        cancelListBtn.addEventListener('click', function () {
+            clearSelection();
         });
     }
 
