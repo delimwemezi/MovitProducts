@@ -190,6 +190,14 @@ body, html {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 16px;
+}
+
+.navbar .nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
 }
 
 .navbar .nav a {
@@ -197,6 +205,30 @@ body, html {
     margin: 0 10px;
     text-decoration: none;
     font-weight: bold;
+}
+
+.navbar .nav form {
+    display: inline-flex;
+    align-items: center;
+    margin: 0;
+}
+
+.nav-logout-btn {
+    background: linear-gradient(135deg, #7c3aed, #ec4899);
+    color: #fff;
+    border: none;
+    border-radius: 999px;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 8px 18px rgba(124, 58, 237, 0.18);
+}
+
+.nav-logout-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 22px rgba(124, 58, 237, 0.25);
 }
 
 .logo {

@@ -62,10 +62,21 @@
                 <p>{{ $product->description }}</p>
                 <p class="price"><span>Carton:</span> TSh {{ number_format($product->carton_price) }}</p>
                 <p class="price"><span>Piece:</span> TSh {{ number_format($product->piece_price) }}</p>
-                <button type="button" class="add-to-list-btn" data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}">Add to the list</button>
+                <button type="button" class="add-to-list-btn" data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}">
+                    <span class="btn-label">Add to the list</span>
+                    <span class="btn-tick" aria-hidden="true">✓</span>
+                </button>
             </div>
         </div>
         @endforeach
+    </div>
+
+    <div class="list-notice" id="listNotice" aria-live="polite" hidden>
+        <div>
+            <strong>Product added to your list.</strong>
+            <p>Review your selection and confirm before sending.</p>
+        </div>
+        <button type="button" class="view-list-btn" id="viewListBtn">View list</button>
     </div>
 
     <form action="{{ route('product-lists.store') }}" method="POST" class="product-list-confirmation" id="productListForm">
@@ -114,7 +125,10 @@
 
 <style>
     .add-to-list-btn {
-        display: inline-block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
         width: 100%;
         margin-top: 14px;
         background: linear-gradient(135deg, #7c3aed, #ec4899);
@@ -122,6 +136,58 @@
         border: none;
         border-radius: 10px;
         padding: 12px 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .add-to-list-btn.is-selected {
+        background: linear-gradient(135deg, #16a34a, #22c55e);
+        box-shadow: 0 12px 22px rgba(34, 197, 94, 0.22);
+    }
+    .btn-label {
+        flex: 1;
+        text-align: center;
+    }
+    .btn-tick {
+        display: none;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        font-size: 1rem;
+        line-height: 24px;
+        font-weight: 800;
+    }
+    .add-to-list-btn.is-selected .btn-tick {
+        display: inline-block;
+    }
+    .list-notice {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin: 0 0 22px;
+        padding: 16px 18px;
+        border-radius: 16px;
+        border: 1px solid #dcfce7;
+        background: linear-gradient(135deg, #f0fdf4, #ecfeff);
+        box-shadow: 0 12px 24px rgba(34, 197, 94, 0.08);
+    }
+    .list-notice strong {
+        display: block;
+        color: #166534;
+        margin-bottom: 4px;
+    }
+    .list-notice p {
+        margin: 0;
+        color: #166534;
+    }
+    .view-list-btn {
+        background: linear-gradient(135deg, #7c3aed, #ec4899);
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 11px 18px;
         font-weight: 700;
         cursor: pointer;
     }
@@ -264,6 +330,19 @@
     const selectedContainer = document.getElementById('selectedProductsContainer');
     const selectionCountEl = document.getElementById('selectionCount');
     const estimatedTotalEl = document.getElementById('estimatedTotal');
+    const listNotice = document.getElementById('listNotice');
+    const viewListBtn = document.getElementById('viewListBtn');
+    const listForm = document.getElementById('productListForm');
+
+    function toggleNotice(show) {
+        if (!listNotice) return;
+        listNotice.hidden = !show;
+    }
+
+    function scrollToList() {
+        if (!listForm) return;
+        listForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 
     function updateSummary() {
         const items = Array.from(selectedProducts.values());
@@ -342,6 +421,18 @@
         });
     }
 
+    function refreshSelectionButtons() {
+        document.querySelectorAll('.add-to-list-btn').forEach((button) => {
+            const productId = Number(button.dataset.productId);
+            const isSelected = selectedProducts.has(productId);
+            button.classList.toggle('is-selected', isSelected);
+            const label = button.querySelector('.btn-label');
+            if (label) {
+                label.textContent = isSelected ? 'Added to list' : 'Add to the list';
+            }
+        });
+    }
+
     document.querySelectorAll('.add-to-list-btn').forEach((button) => {
         button.addEventListener('click', function () {
             const productId = Number(this.dataset.productId);
@@ -349,18 +440,29 @@
 
             if (!product) return;
 
-            if (!selectedProducts.has(productId)) {
+            if (selectedProducts.has(productId)) {
+                selectedProducts.delete(productId);
+                toggleNotice(false);
+            } else {
                 selectedProducts.set(productId, {
                     ...product,
                     cartons: 1,
                     pieces: 0,
                 });
+                toggleNotice(true);
             }
 
+            refreshSelectionButtons();
             updateSummary();
             syncHiddenFields();
         });
     });
+
+    if (viewListBtn) {
+        viewListBtn.addEventListener('click', function () {
+            scrollToList();
+        });
+    }
 
     document.addEventListener('input', function (event) {
         const target = event.target;
@@ -385,6 +487,8 @@
         syncHiddenFields();
     });
 
+    toggleNotice(false);
+    refreshSelectionButtons();
     updateSummary();
     syncHiddenFields();
 </script>
