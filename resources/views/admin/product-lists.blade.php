@@ -18,6 +18,7 @@
             <div><strong>Email:</strong> {{ $business->email }}</div>
             <div><strong>Location:</strong> {{ $business->location }}</div>
             <div><strong>Phone:</strong> {{ $business->phone }}</div>
+            <div><strong>WhatsApp:</strong> {{ $business->whatsapp_number ?: $business->phone }}</div>
         </div>
 
         <form method="POST" action="{{ url('/admin/business-profile') }}" class="business-form">
@@ -31,9 +32,13 @@
                     <label for="location">Location</label>
                     <input id="location" type="text" name="location" value="{{ old('location', $business->location) }}" required>
                 </div>
-                <div class="field-group full-width">
+                <div class="field-group">
                     <label for="phone">Phone number</label>
                     <input id="phone" type="text" name="phone" value="{{ old('phone', $business->phone) }}" required>
+                </div>
+                <div class="field-group">
+                    <label for="whatsapp_number" class="icon-label"><span aria-hidden="true">💬</span> WhatsApp number</label>
+                    <input id="whatsapp_number" type="text" name="whatsapp_number" value="{{ old('whatsapp_number', $business->whatsapp_number) }}" placeholder="Optional; uses phone if left blank">
                 </div>
             </div>
             <button type="submit" class="primary-btn">Save business details</button>
@@ -128,6 +133,7 @@
     .field-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .field-group { display: flex; flex-direction: column; gap: 6px; }
     .full-width { grid-column: 1 / -1; }
+    .icon-label { display: inline-flex; align-items: center; gap: 8px; }
     .field-group input { width: 100%; border: 1px solid #d1d5db; border-radius: 10px; padding: 10px 12px; }
     .stats-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-bottom: 28px; }
     .stat-card { padding: 18px; display: flex; flex-direction: column; gap: 8px; }

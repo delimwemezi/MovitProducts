@@ -12,6 +12,7 @@ class ProductRequestList extends Model
         'user_id',
         'customer_name',
         'phone',
+        'whatsapp_number',
         'location',
         'notes',
         'total_amount',

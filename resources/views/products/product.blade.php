@@ -107,6 +107,10 @@
                     <label for="phone">Phone number</label>
                     <input id="phone" type="text" name="phone" value="{{ old('phone') }}" required>
                 </div>
+                <div class="field-group">
+                    <label for="whatsapp_number" class="icon-label"><span aria-hidden="true">💬</span> WhatsApp number</label>
+                    <input id="whatsapp_number" type="text" name="whatsapp_number" value="{{ old('whatsapp_number') }}" placeholder="Optional; defaults to phone number">
+                </div>
                 <div class="field-group full-width">
                     <label for="location">Location</label>
                     <input id="location" type="text" name="location" value="{{ old('location') }}" required>
@@ -343,6 +347,11 @@
     .field-group label {
         font-weight: 600;
         color: #374151;
+    }
+    .icon-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
     }
     .field-group input,
     .field-group textarea {

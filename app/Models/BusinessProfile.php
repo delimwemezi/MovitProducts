@@ -10,5 +10,6 @@ class BusinessProfile extends Model
         'email',
         'location',
         'phone',
+        'whatsapp_number',
     ];
 }

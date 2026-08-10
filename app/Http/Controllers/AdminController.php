@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Http;
+use App\Mail\ProductRequestApproved;
+use App\Models\BusinessProfile;
+use App\Models\Category;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductImage;
-use App\Models\Order;
-use App\Models\Category;
-use App\Models\User;
-use App\Models\BusinessProfile;
 use App\Models\ProductRequestList;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class AdminController extends Controller
 {
@@ -137,7 +139,32 @@ class AdminController extends Controller
         $list->status = 'approved';
         $list->save();
 
-        return back()->with('success', 'Reply sent to the customer.');
+        $business = BusinessProfile::firstOrCreate([
+            'email' => config('mail.from.address', 'admin@movitproducts.com'),
+        ], [
+            'location' => 'Not set yet',
+            'phone' => 'Not set yet',
+            'whatsapp_number' => null,
+        ]);
+
+        $whatsappNumber = $list->whatsapp_number ?: $list->phone;
+        $managerWhatsapp = $business->whatsapp_number ?: $business->phone;
+
+        if ($whatsappNumber) {
+            $message = "Hello {$list->customer_name},\n\nYour product request has been approved.\nAdmin message: {$list->admin_reply}\n\nLocation: {$list->location}\nTotal amount: TSh " . number_format($list->total_amount, 2) . "\n\nThank you.";
+
+            $encodedMessage = urlencode($message);
+            $url = 'https://wa.me/' . preg_replace('/\D+/', '', $whatsappNumber) . '?text=' . $encodedMessage;
+
+            if ($managerWhatsapp) {
+                $managerUrl = 'https://wa.me/' . preg_replace('/\D+/', '', $managerWhatsapp) . '?text=' . urlencode("Approved request for {$list->customer_name}.\nAdmin message: {$list->admin_reply}");
+                Http::get($managerUrl);
+            }
+
+            Http::get($url);
+        }
+
+        return back()->with('success', 'Approval message sent to the customer and business manager on WhatsApp.');
     }
 
     public function updateBusinessProfile(Request $request)
@@ -148,13 +175,14 @@ class AdminController extends Controller
             'email' => 'required|email',
             'location' => 'required|string',
             'phone' => 'required|string',
+            'whatsapp_number' => 'nullable|string',
         ]);
 
         $profile = BusinessProfile::firstOrCreate([
             'email' => config('mail.from.address', 'admin@movitproducts.com'),
         ]);
 
-        $profile->fill($request->only(['email', 'location', 'phone']));
+        $profile->fill($request->only(['email', 'location', 'phone', 'whatsapp_number']));
         $profile->save();
 
         return back()->with('success', 'Business contact details updated.');

@@ -26,6 +26,7 @@ class ProductRequestController extends Controller
         $request->validate([
             'email' => 'required|email|max:255',
             'phone' => 'required|string|max:30',
+            'whatsapp_number' => 'nullable|string|max:30',
             'location' => 'required|string|max:255',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
@@ -66,6 +67,7 @@ class ProductRequestController extends Controller
             'user_id' => Auth::id(),
             'customer_name' => $request->email,
             'phone' => $request->phone,
+            'whatsapp_number' => $request->whatsapp_number ?: $request->phone,
             'location' => $request->location,
             'notes' => $request->notes,
             'total_amount' => $totalAmount,
