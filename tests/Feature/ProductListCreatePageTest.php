@@ -14,6 +14,7 @@ class ProductListCreatePageTest extends TestCase
         $response = $this->get('/product-lists/create');
 
         $response->assertOk();
-        $response->assertSee('Create your list');
+        $response->assertSee('Email address');
+        $response->assertSee('Confirm and send list');
     }
 }

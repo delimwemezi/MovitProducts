@@ -66,90 +66,12 @@
         </div>
     </section>
 
-    <section class="wishlist-cta" id="wishlistCta">
-        <div class="wishlist-inner">
-            <div>
-                <p class="eyebrow">Need a custom shopping list?</p>
-                <h2>Create your list when you are ready.</h2>
-                <p>Select products, add quantities, and send your request when you want.</p>
-            </div>
-            <div class="wishlist-actions">
-                <a href="{{ route('product-lists.create') }}" class="cta-button">Create list</a>
-                <button type="button" class="dismiss-button" data-dismiss-home-banner>Cancel</button>
-            </div>
-        </div>
-    </section>
-
 <script>
     const trigger = document.getElementById('categoryTrigger');
-    trigger.addEventListener('click', () => trigger.classList.toggle('open'));
-    document.addEventListener('click', e => {
-        if (!trigger.contains(e.target)) trigger.classList.remove('open');
-    });
-</script>
-<style>
-    .wishlist-cta {
-        max-width: 1100px;
-        margin: 30px auto 50px;
-        padding: 0 20px;
-    }
-    .wishlist-inner {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-        background: linear-gradient(135deg, #f5f3ff, #fdf2f8);
-        border: 1px solid #e9d5ff;
-        border-radius: 22px;
-        padding: 28px 30px;
-    }
-    .eyebrow {
-        text-transform: uppercase;
-        letter-spacing: 0.12em;
-        font-size: 12px;
-        color: #7c3aed;
-        font-weight: 700;
-    }
-    .wishlist-inner h2 { margin: 8px 0; color: #111827; }
-    .wishlist-actions {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-    .cta-button, .dismiss-button {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 14px 22px;
-        border-radius: 12px;
-        font-weight: 700;
-        border: none;
-        cursor: pointer;
-    }
-    .cta-button {
-        background: linear-gradient(135deg, #7c3aed, #ec4899);
-        color: #fff;
-        text-decoration: none;
-    }
-    .dismiss-button {
-        background: #fff;
-        color: #374151;
-        border: 1px solid #d1d5db;
-    }
-    @media (max-width: 760px) { .wishlist-inner { display: grid; } .wishlist-actions { justify-content: flex-start; } }
-</style>
-<script>
-    const trigger = document.getElementById('categoryTrigger');
-    trigger.addEventListener('click', () => trigger.classList.toggle('open'));
-    document.addEventListener('click', e => {
-        if (!trigger.contains(e.target)) trigger.classList.remove('open');
-    });
-
-    const homeBanner = document.getElementById('wishlistCta');
-    const dismissHomeBanner = document.querySelector('[data-dismiss-home-banner]');
-    if (homeBanner && dismissHomeBanner) {
-        dismissHomeBanner.addEventListener('click', () => {
-            homeBanner.style.display = 'none';
+    if (trigger) {
+        trigger.addEventListener('click', () => trigger.classList.toggle('open'));
+        document.addEventListener('click', e => {
+            if (!trigger.contains(e.target)) trigger.classList.remove('open');
         });
     }
 </script>
