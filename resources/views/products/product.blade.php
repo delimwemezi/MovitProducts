@@ -72,12 +72,8 @@
     </div>
 
     <div class="list-notice" id="listNotice" aria-live="polite" hidden>
-        <div class="notice-content">
-            <strong>Product added to your list.</strong>
-            <p>Review your selection and confirm before sending.</p>
-        </div>
         <div class="notice-actions">
-            <button type="button" class="view-list-btn" id="viewListBtn">View list</button>
+            <button type="button" class="view-list-btn" id="viewListBtn">View</button>
             <button type="button" class="dismiss-list-btn" id="dismissListBtn" aria-label="Dismiss list notice">×</button>
         </div>
     </div>
@@ -169,64 +165,46 @@
     }
     .list-notice {
         position: fixed;
-        right: 22px;
-        bottom: 22px;
+        right: 16px;
+        bottom: 20px;
         z-index: 1000;
         display: flex;
         align-items: center;
-        justify-content: space-between;
-        gap: 14px;
-        width: min(360px, calc(100vw - 28px));
+        justify-content: flex-end;
         margin: 0;
-        padding: 16px 18px;
-        border-radius: 16px;
-        border: 1px solid #dcfce7;
-        background: linear-gradient(135deg, #f0fdf4, #ecfeff);
-        box-shadow: 0 18px 38px rgba(34, 197, 94, 0.18);
-    }
-    .notice-content {
-        flex: 1;
-        min-width: 0;
+        background: transparent;
     }
     .notice-actions {
         display: flex;
         align-items: center;
-        gap: 10px;
-        flex-shrink: 0;
-    }
-    .list-notice strong {
-        display: block;
-        color: #166534;
-        margin-bottom: 4px;
-    }
-    .list-notice p {
-        margin: 0;
-        color: #166534;
-        line-height: 1.4;
+        gap: 8px;
+        padding: 0;
     }
     .view-list-btn {
         background: linear-gradient(135deg, #7c3aed, #ec4899);
         color: #fff;
         border: none;
         border-radius: 10px;
-        padding: 11px 18px;
+        padding: 10px 16px;
         font-weight: 700;
         cursor: pointer;
+        box-shadow: 0 10px 22px rgba(124, 58, 237, 0.25);
     }
     .dismiss-list-btn {
-        width: 32px;
-        height: 32px;
+        width: 28px;
+        height: 28px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        border: 1px solid rgba(22, 101, 52, 0.2);
-        background: rgba(255, 255, 255, 0.7);
-        color: #166534;
+        border: none;
+        background: rgba(15, 23, 42, 0.75);
+        color: #fff;
         border-radius: 50%;
-        font-size: 1.5rem;
+        font-size: 1.4rem;
         line-height: 1;
         cursor: pointer;
         padding: 0;
+        box-shadow: 0 10px 22px rgba(15, 23, 42, 0.2);
     }
     .product-list-confirmation {
         margin: 28px 0 50px;
