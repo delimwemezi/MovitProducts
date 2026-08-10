@@ -7,7 +7,7 @@
     <div class="nav">
         <a href="/">Home</a>
         <a href="/products">Products</a>
-        <a href="{{ route('product-lists.create') }}">Product List</a>
+        <a href="{{ route('product-lists.create') }}">List</a>
         @auth
             <a href="{{ route('product-lists.history') }}">My Lists</a>
             <form method="POST" action="{{ route('customer.logout') }}" style="display:inline; margin:0;">

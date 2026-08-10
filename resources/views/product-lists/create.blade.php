@@ -3,10 +3,19 @@
 @section('title', 'Create Product List')
 
 @section('content')
+@php
+    $productsForJs = $products->map(function ($product) {
+        return [
+            'id' => $product->id,
+            'carton_price' => (float) $product->carton_price,
+            'piece_price' => (float) $product->piece_price,
+        ];
+    })->values()->all();
+@endphp
 <div class="wishlist-page">
     <div class="wishlist-header">
         <p class="eyebrow">Customer request</p>
-        <h1>Create your product list</h1>
+        <h1>Create your list</h1>
         <p>Tell us the products you want and the quantity. We will review and contact you.</p>
     </div>
 
@@ -227,11 +236,7 @@
     const cartonCountEl = document.getElementById('cartonCount');
     const totalAmountEl = document.getElementById('totalAmount');
 
-    const products = @json($products->map(fn ($product) => [
-        'id' => $product->id,
-        'carton_price' => (float) $product->carton_price,
-        'piece_price' => (float) $product->piece_price,
-    ]));
+    const products = @json($productsForJs);
 
     function updateSummary() {
         let count = 0;
