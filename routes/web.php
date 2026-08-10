@@ -10,6 +10,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\HelpController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductImageController;
+use App\Http\Controllers\ProductRequestController;
 
 // ============================
 // FRONTEND
@@ -22,18 +23,67 @@ Route::get('/cart', function () { return view('cart'); });
 Route::get('/checkout', function () { return view('checkout'); });
 Route::post('/place-order', [OrderController::class, 'store']);
 
+Route::get('/product-lists/create', [ProductRequestController::class, 'create'])->name('product-lists.create');
+Route::post('/product-lists/store', [ProductRequestController::class, 'store'])->name('product-lists.store');
+Route::get('/product-lists/history', [ProductRequestController::class, 'history'])->name('product-lists.history');
+
+Route::get('/register', function () {
+    return view('auth.register');
+})->name('register');
+Route::post('/register', function (\Illuminate\Http\Request $request) {
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users,email',
+        'password' => 'required|min:8|confirmed',
+    ]);
+
+    $user = \App\Models\User::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => bcrypt($request->password),
+    ]);
+
+    Auth::login($user);
+
+    return redirect()->route('product-lists.history')->with('success', 'Account created successfully.');
+});
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login');
+Route::post('/login', function (\Illuminate\Http\Request $request) {
+    $credentials = $request->only('email', 'password');
+
+    if (Auth::attempt($credentials)) {
+        $request->session()->regenerate();
+        return redirect()->intended(route('product-lists.history'));
+    }
+
+    return back()->withErrors(['email' => 'The provided credentials do not match our records.']);
+});
+Route::post('/logout', function (\Illuminate\Http\Request $request) {
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    return redirect('/')->with('success', 'You have been logged out.');
+})->name('logout');
+
 // ✅ NEW: Product image route - serve images from database
 Route::get('/product-image/{imageId}', [ProductImageController::class, 'show'])->name('product.image');
 
 // ADMIN
 // ============================
 Route::get('/admin', function () { return redirect('/admin/login'); });
-Route::get('/admin/login', [AdminController::class, 'showLogin'])->name('login');
+Route::get('/admin/login', [AdminController::class, 'showLogin'])->name('admin.login');
 Route::post('/admin/login', [AdminController::class, 'login']);
 Route::get('/admin/logout', [AdminController::class, 'logout'])->name('logout');
 
 Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard']);
+    Route::get('/product-lists', [AdminController::class, 'productLists']);
+    Route::post('/business-profile', [AdminController::class, 'updateBusinessProfile']);
+    Route::post('/product-lists/{id}/review', [AdminController::class, 'reviewProductList']);
+    Route::post('/product-lists/{id}/reply', [AdminController::class, 'replyToProductList']);
 
     // Products
     Route::get('/products', [AdminController::class, 'products']);

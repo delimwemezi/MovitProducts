@@ -66,6 +66,17 @@
         </div>
     </section>
 
+    <section class="wishlist-cta">
+        <div class="wishlist-inner">
+            <div>
+                <p class="eyebrow">Need a custom shopping list?</p>
+                <h2>Create your product request list.</h2>
+                <p>Select products, add quantities, and send your list to the business in one click.</p>
+            </div>
+            <a href="{{ route('product-lists.create') }}" class="cta-button">Create product list</a>
+        </div>
+    </section>
+
 <script>
     const trigger = document.getElementById('categoryTrigger');
     trigger.addEventListener('click', () => trigger.classList.toggle('open'));
@@ -73,5 +84,42 @@
         if (!trigger.contains(e.target)) trigger.classList.remove('open');
     });
 </script>
+<style>
+    .wishlist-cta {
+        max-width: 1100px;
+        margin: 30px auto 50px;
+        padding: 0 20px;
+    }
+    .wishlist-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        background: linear-gradient(135deg, #f5f3ff, #fdf2f8);
+        border: 1px solid #e9d5ff;
+        border-radius: 22px;
+        padding: 28px 30px;
+    }
+    .eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-size: 12px;
+        color: #7c3aed;
+        font-weight: 700;
+    }
+    .wishlist-inner h2 { margin: 8px 0; color: #111827; }
+    .cta-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #7c3aed, #ec4899);
+        color: #fff;
+        padding: 14px 22px;
+        border-radius: 12px;
+        text-decoration: none;
+        font-weight: 700;
+    }
+    @media (max-width: 760px) { .wishlist-inner { display: grid; } }
+</style>
 @include('partials.alerts')
 @endsection

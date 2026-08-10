@@ -26,8 +26,11 @@ return new class extends Migration
             $table->index('product_id');
         });
 
-        // Alter to LONGBLOB for large image storage (BLOB is limited to ~64KB)
-        \Illuminate\Support\Facades\DB::statement('ALTER TABLE product_images MODIFY image_data LONGBLOB');
+        // Alter to LONGBLOB for large image storage (BLOB is limited to ~64KB).
+        // This syntax is MySQL-specific, so SQLite must skip the statement.
+        if (config('database.default') !== 'sqlite') {
+            \Illuminate\Support\Facades\DB::statement('ALTER TABLE product_images MODIFY image_data LONGBLOB');
+        }
     }
 
     /**

@@ -50,7 +50,8 @@
         <h3>{{ $product->name }}</h3>
         <p>{{ $product->description }}</p>
             <p class="price"><span>Carton:</span> TSh {{ number_format($product->carton_price) }}</p>
-            <p class="price"><span>Piece:</span> TSh {{ number_format($product->piece_price) }}</p>  
+            <p class="price"><span>Piece:</span> TSh {{ number_format($product->piece_price) }}</p>
+            <a href="{{ route('product-lists.create') }}" class="wishlist-mini-btn">Create product list</a>
     </div>
      
             <!-- BUTTON 
@@ -63,7 +64,31 @@
         @endforeach
     </div>
 
+    <div class="wishlist-banner">
+        <h2>Need a custom list?</h2>
+        <a href="{{ route('product-lists.create') }}" class="cta-button">Request products</a>
+    </div>
+
 </div>
+
+.wishlist-mini-btn, .cta-button {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #7c3aed, #ec4899);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+}
+.wishlist-banner {
+    margin: 24px 0 50px;
+    text-align: center;
+    background: linear-gradient(135deg, #f5f3ff, #fdf2f8);
+    border: 1px solid #e9d5ff;
+    border-radius: 18px;
+    padding: 28px;
+}
 
 @include('partials.alerts')
 @endsection

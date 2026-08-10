@@ -11,6 +11,8 @@ use App\Models\ProductImage;
 use App\Models\Order;
 use App\Models\Category;
 use App\Models\User;
+use App\Models\BusinessProfile;
+use App\Models\ProductRequestList;
 
 class AdminController extends Controller
 {
@@ -85,7 +87,77 @@ class AdminController extends Controller
     public function dashboard()
     {
         if ($redirect = $this->checkAuth()) return $redirect;
-        return view('admin.dashboard');
+
+        $requestLists = ProductRequestList::with('items')->latest()->get();
+        $totalRequests = $requestLists->count();
+        $reviewed = $requestLists->where('status', 'reviewed')->count();
+        $replied = $requestLists->whereNotNull('admin_reply')->count();
+
+        return view('admin.dashboard', compact('requestLists', 'totalRequests', 'reviewed', 'replied'));
+    }
+
+    public function productLists()
+    {
+        if ($redirect = $this->checkAuth()) return $redirect;
+
+        $requestLists = ProductRequestList::with('items')->latest()->get();
+        $business = BusinessProfile::firstOrCreate([
+            'email' => config('mail.from.address', 'admin@movitproducts.com'),
+        ], [
+            'location' => 'Not set yet',
+            'phone' => 'Not set yet',
+        ]);
+
+        return view('admin.product-lists', compact('requestLists', 'business'));
+    }
+
+    public function reviewProductList(int $id)
+    {
+        if ($redirect = $this->checkAuth()) return $redirect;
+
+        $list = ProductRequestList::findOrFail($id);
+        $list->status = 'reviewed';
+        $list->reviewed_at = now();
+        $list->save();
+
+        return back()->with('success', 'Product request list marked as reviewed.');
+    }
+
+    public function replyToProductList(Request $request, int $id)
+    {
+        if ($redirect = $this->checkAuth()) return $redirect;
+
+        $request->validate([
+            'admin_reply' => 'required|string',
+        ]);
+
+        $list = ProductRequestList::findOrFail($id);
+        $list->admin_reply = $request->admin_reply;
+        $list->replied_at = now();
+        $list->status = 'approved';
+        $list->save();
+
+        return back()->with('success', 'Reply sent to the customer.');
+    }
+
+    public function updateBusinessProfile(Request $request)
+    {
+        if ($redirect = $this->checkAuth()) return $redirect;
+
+        $request->validate([
+            'email' => 'required|email',
+            'location' => 'required|string',
+            'phone' => 'required|string',
+        ]);
+
+        $profile = BusinessProfile::firstOrCreate([
+            'email' => config('mail.from.address', 'admin@movitproducts.com'),
+        ]);
+
+        $profile->fill($request->only(['email', 'location', 'phone']));
+        $profile->save();
+
+        return back()->with('success', 'Business contact details updated.');
     }
 
     // =========================

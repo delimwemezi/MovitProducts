@@ -134,6 +134,11 @@
             <div class="icon"></div>
             <h2>Manage Products</h2>
         </a>
+
+        <a href="/admin/product-lists" class="card">
+            <div class="icon"></div>
+            <h2>Product Lists</h2>
+        </a>
          <!---
         <a href="/admin/orders" class="card">
             <div class="icon">🧾</div>
