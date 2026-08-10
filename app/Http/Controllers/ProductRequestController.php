@@ -24,7 +24,7 @@ class ProductRequestController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'customer_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
             'phone' => 'required|string|max:30',
             'location' => 'required|string|max:255',
             'items' => 'required|array|min:1',
@@ -64,7 +64,7 @@ class ProductRequestController extends Controller
 
         $list = ProductRequestList::create([
             'user_id' => Auth::id(),
-            'customer_name' => $request->customer_name,
+            'customer_name' => $request->email,
             'phone' => $request->phone,
             'location' => $request->location,
             'notes' => $request->notes,

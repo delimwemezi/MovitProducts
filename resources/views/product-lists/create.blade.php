@@ -35,8 +35,8 @@
         <div class="customer-card">
             <div class="field-grid">
                 <div class="field-group">
-                    <label for="customer_name">Full name</label>
-                    <input id="customer_name" type="text" name="customer_name" value="{{ old('customer_name') }}" required>
+                    <label for="email">Email address</label>
+                    <input id="email" type="email" name="email" value="{{ old('email') }}" required>
                 </div>
                 <div class="field-group">
                     <label for="phone">Phone number</label>
@@ -91,7 +91,7 @@
             </div>
         </div>
 
-        <button type="submit" class="primary-btn">Send product request list</button>
+        <button type="submit" class="primary-btn">Confirm and send list</button>
     </form>
 </div>
 
